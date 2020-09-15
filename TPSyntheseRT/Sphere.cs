@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TPSyntheseRT
 {
-    class Sphere
+    public class Sphere
     {
         private Vector3 center;
         private float radius;

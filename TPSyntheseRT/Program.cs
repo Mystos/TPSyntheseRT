@@ -1,4 +1,4 @@
-﻿using SFML.Graphics;
+using SFML.Graphics;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Numerics;
@@ -6,15 +6,15 @@ using System.Xml;
 
 namespace TPSyntheseRT
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
             uint width = 1000;
             uint height = 1000;
-            Image image = new Image(width, height, Color.Black);
+            Image image = new Image(width, height, Color.Cyan);
             Sphere sphere = new Sphere(new Vector3(width / 2, height / 2, 400), 200);
-            Vector3 L = sphere.Center + Vector3.UnitY * (sphere.Radius + 100);
+            Vector3 L = sphere.Center - Vector3.UnitY * (sphere.Radius + 100);
             float epsilon = 0.1f;
 
             for (uint y = 0; y < height; y++)

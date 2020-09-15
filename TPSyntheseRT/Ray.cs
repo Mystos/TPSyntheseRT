@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace TPSyntheseRT
 {
-    class Ray
+   public class Ray
     {
         private Position startPosition;
         private Direction direction;
