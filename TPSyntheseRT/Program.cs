@@ -17,13 +17,19 @@ namespace TPSyntheseRT
             uint width = 1000;
             uint height = 1000;
             Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
+
             List<Sphere> sphereList = new List<Sphere>();
             sphereList.Add(new Sphere(new Vector3(0, height / 2, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width, height / 2, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width /2, 0, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width /2, height, 400), 200));
-            Vector3 L = new Vector3(width / 2, height / 2, 400);
-            float epsilon = 0.1f;
+
+            List<Lamp> listLamp = new List<Lamp>();
+            listLamp.Add(new Lamp(new Vector3(width / 2, height / 2 + 50, 200), new Vector3(1000000, 1000000, 1000000), new Vector3(1,0,0)));
+            listLamp.Add(new Lamp(new Vector3(width / 2, height / 2 - 50, 200), new Vector3(1000000, 1000000, 1000000), new Vector3(0,1,0)));
+
+
+            float epsilon = 0.01f;
 
             for (uint y = 0; y < height; y++)
             {
@@ -40,20 +46,23 @@ namespace TPSyntheseRT
                             Vector3 xPos = ray.StartPosition.Origin + t * ray.Direction.Dir;
                             // On renvoie un rayon depuis xPos vers L
                             Vector3 Pep = xPos - epsilon * ray.Direction.Dir;
-                            Ray rayFromX = new Ray(new Position(Pep), new Direction(Vector3.Normalize(L - Pep)));
-                            float tL;
-                            if (Intersect_Ray_Sphere(rayFromX, sphere, out tL))
+
+                            Vector3 couleurPix = new Vector3(0,0,0);
+                            foreach (Lamp lamp in listLamp)
                             {
-                                image.SetPixel(x, y, SFML.Graphics.Color.Black);// Ombre
-                            }
-                            else
-                            {
-                                Vector3 N = Vector3.Normalize(Pep - sphere.Center);
-                                Vector3 le = new Vector3(1000000, 1000000, 1000000);
-                                Vector3 A = new Vector3(1, 0, 0);
-                                Vector3 couleurPix = CalculInstensity(1, N, Vector3.Normalize(L - Pep), Pep, L, le, A);
-                                Color col = CreateColorFromVector(couleurPix);
-                                image.SetPixel(x, y, col); // Lumiere
+                                Ray rayFromX = new Ray(new Position(Pep), new Direction(Vector3.Normalize(lamp.position - Pep)));
+                                float tL;
+                                if (Intersect_Ray_Sphere(rayFromX, sphere, out tL))
+                                {
+                                    image.SetPixel(x, y, Color.Black);// Ombre
+                                }
+                                else
+                                {
+                                    Vector3 N = Vector3.Normalize(Pep - sphere.Center);
+                                    couleurPix += CalculInstensity(1, N, Vector3.Normalize(lamp.position - Pep), Pep, lamp.position, lamp.le, lamp.albedo);
+                                    Color col = CreateColorFromVector(couleurPix);
+                                    image.SetPixel(x, y, col); // Lumiere
+                                }
                             }
                         }
                     }
@@ -63,11 +72,11 @@ namespace TPSyntheseRT
         }
         public static Color CreateColorFromVector(Vector3 vectColor)
         {
-            float maxIntensity = 1;
+            float maxIntensity = 2;
  
-            int r = Math.Clamp((int)(vectColor.X * 255f / maxIntensity), 0,255);
-            int g = Math.Clamp((int)(vectColor.Y * 255f / maxIntensity), 0, 255);
-            int b = Math.Clamp((int)(vectColor.Z * 255f / maxIntensity), 0, 255);
+            int r = Math.Clamp((int)(Math.Pow(vectColor.X, 1 / 2.2) * 255f / maxIntensity), 0,255);
+            int g = Math.Clamp((int)(Math.Pow(vectColor.Y, 1 / 2.2) * 255f / maxIntensity), 0, 255);
+            int b = Math.Clamp((int)(Math.Pow(vectColor.Z, 1 / 2.2) * 255f / maxIntensity), 0, 255);
             return new Color((byte)r, (byte)g, (byte)b, 255);
         }
 
