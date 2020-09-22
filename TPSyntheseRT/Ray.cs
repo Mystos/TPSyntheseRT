@@ -14,9 +14,15 @@ namespace TPSyntheseRT
         public Direction Direction { get => direction; set => direction = value; }
         public Position StartPosition { get => startPosition; set => startPosition = value; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="startPosition"></param>
+        /// <param name="direction">La direction sera toujours normaliser</param>
         public Ray(Position startPosition, Direction direction)
         {
             this.startPosition = startPosition;
+            direction.Dir = Vector3.Normalize(direction.Dir);
             this.direction = direction;
         }
     }

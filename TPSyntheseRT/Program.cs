@@ -36,40 +36,89 @@ namespace TPSyntheseRT
                 for (uint x = 0; x < width; x++)
                 {
                     Ray ray = new Ray(new Position(new Vector3(x, y, 0)), new Direction(new Vector3(0, 0, 1)));
-                    float t;
-
-                    foreach(Sphere sphere in sphereList)
+                    Vector3 couleurPix = new Vector3(0, 0, 0);
+                    if (GetFirstIntersectionInScene(sphereList, ray, out Hit hit))
                     {
-                        if (Intersect_Ray_Sphere(ray, sphere, out t))
+                        foreach (Lamp lamp in listLamp)
                         {
-                            // On recupere la position de x
-                            Vector3 xPos = ray.StartPosition.Origin + t * ray.Direction.Dir;
                             // On renvoie un rayon depuis xPos vers L
-                            Vector3 Pep = xPos - epsilon * ray.Direction.Dir;
+                            Vector3 pEp = hit.position - epsilon * ray.Direction.Dir;
+                            Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
 
-                            Vector3 couleurPix = new Vector3(0,0,0);
-                            foreach (Lamp lamp in listLamp)
+                            if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, sphereList))
                             {
-                                Ray rayFromX = new Ray(new Position(Pep), new Direction(Vector3.Normalize(lamp.position - Pep)));
-                                float tL;
-                                if (Intersect_Ray_Sphere(rayFromX, sphere, out tL))
-                                {
-                                    image.SetPixel(x, y, Color.Black);// Ombre
-                                }
-                                else
-                                {
-                                    Vector3 N = Vector3.Normalize(Pep - sphere.Center);
-                                    couleurPix += CalculInstensity(1, N, Vector3.Normalize(lamp.position - Pep), Pep, lamp.position, lamp.le, lamp.albedo);
-                                    Color col = CreateColorFromVector(couleurPix);
-                                    image.SetPixel(x, y, col); // Lumiere
-                                }
+                                couleurPix += new Vector3(0, 0, 0);
+                            }
+                            else
+                            {
+                                Vector3 N = Vector3.Normalize(pEp - hit.sphere.Center);
+                                couleurPix += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, lamp.albedo);
                             }
                         }
+                        Color col = CreateColorFromVector(couleurPix);
+                        image.SetPixel(x, y, col); // Lumiere
                     }
+
                 }
             }
             image.SaveToFile("result.png");
         }
+
+        public static bool IsThereAnIntersectionBetweenAandB(Vector3 a, Vector3 b, List<Sphere> scene)
+        {
+            Ray ray = new Ray(new Position(a), new Direction(b-a));
+            foreach (Sphere sphere in scene)
+            {
+                if (Intersect_Ray_Sphere(ray, sphere, out _))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Donne la premiere intersection
+        /// </summary>
+        /// <param name="listSphere"></param>
+        /// <param name="rayon"></param>
+        /// <returns></returns>
+        public static bool GetFirstIntersectionInScene(List<Sphere> listSphere, Ray rayon, out Hit firstHit)
+        {
+            firstHit = new Hit();
+            bool hasFoundIntersection = false;
+            int i = 0;
+            foreach (Sphere sphere in listSphere)
+            {
+                float t;
+                if (Intersect_Ray_Sphere(rayon, sphere, out t))
+                {
+                    hasFoundIntersection = true;
+                    if(i == 0)
+                    {
+                        firstHit.sphere = sphere;
+                        firstHit.distance = t;
+                    }
+                    if (t < firstHit.distance)
+                    {
+                        firstHit.sphere = sphere;
+                        firstHit.distance = t;
+                    }
+                }
+            }
+            if (hasFoundIntersection)
+            {
+                // On recupere la position de x
+                firstHit.position = rayon.StartPosition.Origin + firstHit.distance * rayon.Direction.Dir;
+            }
+
+            return hasFoundIntersection;
+
+
+        } 
+
+
         public static Color CreateColorFromVector(Vector3 vectColor)
         {
             float maxIntensity = 2;
