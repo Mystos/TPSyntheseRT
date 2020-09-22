@@ -16,9 +16,12 @@ namespace TPSyntheseRT
 
             uint width = 1000;
             uint height = 1000;
+            Vector3 pointPerspective = new Vector3(width / 2, height/ 2, -500);
             Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
 
             List<Sphere> sphereList = new List<Sphere>();
+            //Sphere sphereGrosse = new Sphere(new Vector3(0, 1000000, 0), 1000000 / 2);
+            //sphereList.Add(sphereGrosse);
             Sphere sphere1 = new Sphere(new Vector3(width / 2, height / 2, 400), 250, SurfaceType.Reflective);
             Sphere sphere2 = new Sphere(new Vector3(0, height / 2, 400), 250);
             sphere2.Albedo = new Vector3(1, 0, 0);
@@ -40,9 +43,17 @@ namespace TPSyntheseRT
             {
                 for (uint x = 0; x < width; x++)
                 {
-                    Ray ray = new Ray(new Position(new Vector3(x, y, 0)), new Direction(new Vector3(0, 0, 1)));
-                    Vector3 couleurPix = new Vector3(0, 0, 0);
                     Option option = new Option();
+                    option.cameraType = CameraType.Perspective;
+                    Direction dir = new Direction(new Vector3(0, 0, 1));
+
+                    if (option.cameraType == CameraType.Perspective)
+                    {
+                        dir = new Direction(new Vector3(x, y, 0) - new Vector3(pointPerspective.X, pointPerspective.Y, pointPerspective.Z));
+                    }
+
+                    Ray ray = new Ray(new Position(new Vector3(x, y, 0)), dir);
+                    Vector3 couleurPix = new Vector3(0, 0, 0);
 
                     couleurPix = CastRay(ray, sphereList, listLamp, option);
    
