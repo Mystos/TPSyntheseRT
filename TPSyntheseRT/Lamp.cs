@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TPSyntheseRT
 {
-    class Lamp
+    public class Lamp
     {
         public Vector3 position;
         public Vector3 le;

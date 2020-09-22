@@ -19,17 +19,15 @@ namespace TPSyntheseRT
             Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
 
             List<Sphere> sphereList = new List<Sphere>();
+            sphereList.Add(new Sphere(new Vector3(width / 2, height / 2, 400), 200, SurfaceType.Reflective));
             sphereList.Add(new Sphere(new Vector3(0, height / 2, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width, height / 2, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width /2, 0, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width /2, height, 400), 200));
 
             List<Lamp> listLamp = new List<Lamp>();
-            listLamp.Add(new Lamp(new Vector3(width / 2, height / 2 + 50, 200), new Vector3(1000000, 1000000, 1000000), new Vector3(1,0,0)));
-            listLamp.Add(new Lamp(new Vector3(width / 2, height / 2 - 50, 200), new Vector3(1000000, 1000000, 1000000), new Vector3(0,1,0)));
-
-
-            float epsilon = 0.01f;
+            listLamp.Add(new Lamp(new Vector3(width / 2, height / 2 + 250, 200), new Vector3(1000000, 1000000, 1000000), new Vector3(1,0,0)));
+            listLamp.Add(new Lamp(new Vector3(width / 2, height / 2 - 250, 200), new Vector3(1000000, 1000000, 1000000), new Vector3(0,0,1)));
 
             for (uint y = 0; y < height; y++)
             {
@@ -37,31 +35,71 @@ namespace TPSyntheseRT
                 {
                     Ray ray = new Ray(new Position(new Vector3(x, y, 0)), new Direction(new Vector3(0, 0, 1)));
                     Vector3 couleurPix = new Vector3(0, 0, 0);
-                    if (GetFirstIntersectionInScene(sphereList, ray, out Hit hit))
-                    {
-                        foreach (Lamp lamp in listLamp)
-                        {
-                            // On renvoie un rayon depuis xPos vers L
-                            Vector3 pEp = hit.position - epsilon * ray.Direction.Dir;
-                            Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
 
-                            if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, sphereList))
-                            {
-                                couleurPix += new Vector3(0, 0, 0);
-                            }
-                            else
-                            {
-                                Vector3 N = Vector3.Normalize(pEp - hit.sphere.Center);
-                                couleurPix += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, lamp.albedo);
-                            }
-                        }
-                        Color col = CreateColorFromVector(couleurPix);
-                        image.SetPixel(x, y, col); // Lumiere
-                    }
+                    couleurPix = CastRay(ray, sphereList, listLamp, 5);
+   
+                    Color col = CreateColorFromVector(couleurPix);
+                    image.SetPixel(x, y, col); // Lumiere
 
                 }
             }
             image.SaveToFile("result.png");
+        }
+
+
+        public static Vector3 CastRay(Ray rayon, List<Sphere> listSphere, List<Lamp> listLamp, uint maxDepth, uint depth = 0)
+        {
+            float epsilon = 0.01f;
+            Vector3 couleurPix = new Vector3(0, 0, 0);
+
+            if (depth > maxDepth)
+            {
+                Color cyan = Color.Cyan;
+                return new Vector3(cyan.R, cyan.G, cyan.B);
+            }
+
+            if (GetFirstIntersectionInScene(listSphere, rayon, out Hit hit))
+            {
+                // On renvoie un rayon depuis xPos vers L
+                Vector3 pEp = hit.position - epsilon * rayon.Direction.Dir;
+                Vector3 N = Vector3.Normalize(pEp - hit.sphere.Center);
+
+                switch (hit.sphere.Type)
+                {
+                    case SurfaceType.Reflective:
+
+                        Ray reflecRay = new Ray(new Position(pEp), new Direction(CalculReflection(rayon, N)));
+                        couleurPix +=  0.8f  * CastRay(reflecRay, listSphere, listLamp, 5, depth + 1);
+                        break;
+                    case SurfaceType.Diffuse:
+                            foreach (Lamp lamp in listLamp)
+                            {
+                                Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
+
+                                if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, listSphere))
+                                {
+                                    couleurPix += new Vector3(0, 0, 0);
+                                }
+                                else
+                                {
+                                    couleurPix += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, lamp.albedo);
+                                }
+                            }
+                            break;
+                }
+            }
+            else
+            {
+                Color cyan = Color.Cyan;
+                return new Vector3(cyan.R, cyan.G, cyan.B);
+            }
+
+            return couleurPix;
+        }
+
+        public static Vector3 CalculReflection(Ray ray, Vector3 N)
+        {
+            return (Vector3.Dot(-ray.Direction.Dir, N)) * N * 2 + ray.Direction.Dir; 
         }
 
         public static bool IsThereAnIntersectionBetweenAandB(Vector3 a, Vector3 b, List<Sphere> scene)
@@ -88,23 +126,22 @@ namespace TPSyntheseRT
         {
             firstHit = new Hit();
             bool hasFoundIntersection = false;
-            int i = 0;
             foreach (Sphere sphere in listSphere)
             {
                 float t;
                 if (Intersect_Ray_Sphere(rayon, sphere, out t))
                 {
+                    if(!hasFoundIntersection)
+                    {
+                        firstHit.sphere = sphere;
+                        firstHit.distance = t;
+                    }
+                    else if(t < firstHit.distance)
+                    {
+                        firstHit.sphere = sphere;
+                        firstHit.distance = t;
+                    }
                     hasFoundIntersection = true;
-                    if(i == 0)
-                    {
-                        firstHit.sphere = sphere;
-                        firstHit.distance = t;
-                    }
-                    if (t < firstHit.distance)
-                    {
-                        firstHit.sphere = sphere;
-                        firstHit.distance = t;
-                    }
                 }
             }
             if (hasFoundIntersection)
