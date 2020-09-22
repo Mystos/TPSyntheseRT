@@ -9,13 +9,12 @@ namespace TPSyntheseRT
     {
         public Vector3 position;
         public Vector3 le;
-        public Vector3 albedo;
+        public Vector3 albedo = new Vector3(1,1,1);
 
-        public Lamp(Vector3 position, Vector3 le, Vector3 albedo)
+        public Lamp(Vector3 position, Vector3 le)
         {
             this.position = position;
             this.le = le;
-            this.albedo = albedo;
         }
 
 

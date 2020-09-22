@@ -1,11 +1,12 @@
 using SFML.Graphics;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Numerics;
 using System.Xml;
-
+using System.Xml.Schema;
 
 namespace TPSyntheseRT
 {
@@ -16,28 +17,13 @@ namespace TPSyntheseRT
 
             uint width = 1000;
             uint height = 1000;
-            Vector3 pointPerspective = new Vector3(width / 2, height/ 2, -500);
+            Vector3 pointPerspective = new Vector3(width / 2, height / 2, -5000);
             Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
 
-            List<Sphere> sphereList = new List<Sphere>();
-            //Sphere sphereGrosse = new Sphere(new Vector3(0, 1000000, 0), 1000000 / 2);
-            //sphereList.Add(sphereGrosse);
-            Sphere sphere1 = new Sphere(new Vector3(width / 2, height / 2, 400), 250, SurfaceType.Reflective);
-            Sphere sphere2 = new Sphere(new Vector3(0, height / 2, 400), 250);
-            sphere2.Albedo = new Vector3(1, 0, 0);
-            Sphere sphere3 = new Sphere(new Vector3(width, height / 2, 400), 250);
-            sphere3.Albedo = new Vector3(0, 0, 1);
-            Sphere sphere4 = new Sphere(new Vector3(width / 2, 0, 400), 250);
-            Sphere sphere5 = new Sphere(new Vector3(width / 2, height, 400), 250);
-            sphereList.Add(sphere1);
-            sphereList.Add(sphere2);
-            sphereList.Add(sphere3);
-            sphereList.Add(sphere4);
-            sphereList.Add(sphere5);
+            List<Sphere> sphereList = BuildSphere(width, height);
 
-            List<Lamp> listLamp = new List<Lamp>();
-            listLamp.Add(new Lamp(new Vector3(0, 0, 200), new Vector3(1000000, 0, 0), new Vector3(1,0,0)));
-            listLamp.Add(new Lamp(new Vector3(width , height, 200), new Vector3(0, 0, 1000000), new Vector3(0,0,1)));
+            List<Lamp> listLamp = BuildLamp(width, height);
+
 
             for (uint y = 0; y < height; y++)
             {
@@ -45,6 +31,7 @@ namespace TPSyntheseRT
                 {
                     Option option = new Option();
                     option.cameraType = CameraType.Perspective;
+                    option.maxDepth = 200;
                     Direction dir = new Direction(new Vector3(0, 0, 1));
 
                     if (option.cameraType == CameraType.Perspective)
@@ -53,12 +40,19 @@ namespace TPSyntheseRT
                     }
 
                     Ray ray = new Ray(new Position(new Vector3(x, y, 0)), dir);
-                    Vector3 couleurPix = new Vector3(0, 0, 0);
 
-                    couleurPix = CastRay(ray, sphereList, listLamp, option);
-   
-                    Color col = CreateColorFromVector(couleurPix);
-                    image.SetPixel(x, y, col); // Lumiere
+                    if(CastRay(ray, sphereList, listLamp, option,out Vector3 couleurPix))
+                    {
+                        Color col = CreateColorFromVector(couleurPix);
+                        image.SetPixel(x, y, col); // Lumiere
+                    }
+                    else
+                    {
+                        Color col = new Color((byte)option.backgroundColor.X, (byte)option.backgroundColor.Y, (byte)option.backgroundColor.Z);
+                        image.SetPixel(x, y,col); // ombre
+                    }
+
+
 
                 }
             }
@@ -66,14 +60,52 @@ namespace TPSyntheseRT
         }
 
 
-        public static Vector3 CastRay(Ray rayon, List<Sphere> listSphere, List<Lamp> listLamp, Option option, uint depth = 0)
+        public static List<Sphere> BuildSphere(uint width, uint height)
         {
-            float epsilon = 0.01f;
-            Vector3 couleurPix = new Vector3(0, 0, 0);
+            List<Sphere> listSphere = new List<Sphere>();
+
+            Sphere sphereGrosse = new Sphere(new Vector3(width / 2, 100000 + height, 800), 100000);
+            listSphere.Add(sphereGrosse);
+
+            Sphere sphere1 = new Sphere(new Vector3(width / 2, height / 2, 400), 250, SurfaceType.Reflective);
+            //listSphere.Add(sphere1);
+
+            Sphere sphere2 = new Sphere(new Vector3(0, height / 2, 400), 250);
+            sphere2.Albedo = new Vector3(1, 0, 0);
+            listSphere.Add(sphere2);
+
+            Sphere sphere3 = new Sphere(new Vector3(width, height / 2, 400), 250);
+            sphere3.Albedo = new Vector3(0, 0, 1);
+            listSphere.Add(sphere3);
+
+            Sphere sphere4 = new Sphere(new Vector3(width / 2, 0, 400), 250);
+            listSphere.Add(sphere4);
+
+            Sphere sphere5 = new Sphere(new Vector3(width / 2, height / 2, 800), 250, SurfaceType.Reflective);
+            listSphere.Add(sphere5);
+
+            return listSphere;
+        }
+
+        public static List<Lamp> BuildLamp(uint width, uint height)
+        {
+            List<Lamp> listLamp = new List<Lamp>();
+
+            listLamp.Add(new Lamp(new Vector3(0, 0, 200), new Vector3(1000000, 0, 0)));
+            listLamp.Add(new Lamp(new Vector3(width, height - 50, 200), new Vector3(1000000, 1000000, 1000000)));
+
+            return listLamp;
+        }
+
+        public static bool CastRay(Ray rayon, List<Sphere> listSphere, List<Lamp> listLamp, Option option, out Vector3 colorHit, uint depth = 0)
+        {
+            float epsilon = 0.1f;
+            colorHit = new Vector3(0, 0, 0);
 
             if (depth > option.maxDepth)
             {
-                return option.backgroundColor;
+                colorHit = new Vector3(0.5f, 0.5f, 0.5f);
+                return true;
             }
 
             if (GetFirstIntersectionInScene(listSphere, rayon, out Hit hit))
@@ -87,41 +119,45 @@ namespace TPSyntheseRT
                     case SurfaceType.Reflective:
 
                         Ray reflecRay = new Ray(new Position(pEp), new Direction(CalculReflection(rayon, N)));
-                        couleurPix +=  0.8f  * CastRay(reflecRay, listSphere, listLamp, option, depth + 1);
+                        if (CastRay(reflecRay, listSphere, listLamp, option, out Vector3 newColor, depth + 1))
+                        {
+                            colorHit += 0.8f * newColor;
+                        }
                         break;
                     case SurfaceType.Diffuse:
-                            foreach (Lamp lamp in listLamp)
-                            {
-                                Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
+                        foreach (Lamp lamp in listLamp)
+                        {
+                            Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
 
-                                if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, listSphere))
-                                {
-                                    couleurPix += new Vector3(0, 0, 0);
-                                }
-                                else
-                                {
-                                    couleurPix += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, hit.sphere.Albedo);
-                                }
+                            if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, listSphere))
+                            {
+                                colorHit += new Vector3(0, 0, 0);
                             }
-                            break;
+                            else
+                            {
+                                colorHit += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, hit.sphere.Albedo);
+                            }
+                        }
+                        break;
                 }
+                return true;
+
             }
             else
             {
-                return option.backgroundColor;
+                return false;
             }
 
-            return couleurPix;
         }
 
         public static Vector3 CalculReflection(Ray ray, Vector3 N)
         {
-            return (Vector3.Dot(-ray.Direction.Dir, N)) * N * 2 + ray.Direction.Dir; 
+            return (Vector3.Dot(-ray.Direction.Dir, N)) * N * 2 + ray.Direction.Dir;
         }
 
         public static bool IsThereAnIntersectionBetweenAandB(Vector3 a, Vector3 b, List<Sphere> scene)
         {
-            Ray ray = new Ray(new Position(a), new Direction(b-a));
+            Ray ray = new Ray(new Position(a), new Direction(b - a));
             foreach (Sphere sphere in scene)
             {
                 if (Intersect_Ray_Sphere(ray, sphere, out _))
@@ -148,12 +184,12 @@ namespace TPSyntheseRT
                 float t;
                 if (Intersect_Ray_Sphere(rayon, sphere, out t))
                 {
-                    if(!hasFoundIntersection)
+                    if (!hasFoundIntersection)
                     {
                         firstHit.sphere = sphere;
                         firstHit.distance = t;
                     }
-                    else if(t < firstHit.distance)
+                    else if (t < firstHit.distance)
                     {
                         firstHit.sphere = sphere;
                         firstHit.distance = t;
@@ -170,20 +206,19 @@ namespace TPSyntheseRT
             return hasFoundIntersection;
 
 
-        } 
-
+        }
 
         public static Color CreateColorFromVector(Vector3 vectColor)
         {
             float maxIntensity = 2;
- 
-            int r = Math.Clamp((int)(Math.Pow(vectColor.X, 1 / 2.2) * 255f / maxIntensity), 0,255);
+
+            int r = Math.Clamp((int)(Math.Pow(vectColor.X, 1 / 2.2) * 255f / maxIntensity), 0, 255);
             int g = Math.Clamp((int)(Math.Pow(vectColor.Y, 1 / 2.2) * 255f / maxIntensity), 0, 255);
             int b = Math.Clamp((int)(Math.Pow(vectColor.Z, 1 / 2.2) * 255f / maxIntensity), 0, 255);
             return new Color((byte)r, (byte)g, (byte)b, 255);
         }
 
-        public static bool SolveQuadratic(ref float a,ref  float b,ref float c,out float x0,out float x1)
+        public static bool SolveQuadratic(ref float a, ref float b, ref float c, out float x0, out float x1)
         {
             float discr = b * b - 4 * a * c;
             if (discr < 0)
@@ -194,12 +229,12 @@ namespace TPSyntheseRT
             }
             else
             {
-                x0 = (-b - MathF.Sqrt(discr)) / (2.0f*a);
-                x1 = (-b + MathF.Sqrt(discr)) / (2.0f*a);
+                x0 = (-b - MathF.Sqrt(discr)) / (2.0f * a);
+                x1 = (-b + MathF.Sqrt(discr)) / (2.0f * a);
             }
 
             return true;
-            
+
 
         }
 
@@ -215,7 +250,7 @@ namespace TPSyntheseRT
             {
                 t = t;
             }
-            else if(t < 0 && t1 > 0)
+            else if (t < 0 && t1 > 0)
             {
                 t = t1;
             }
@@ -238,11 +273,11 @@ namespace TPSyntheseRT
         /// <param name="LQ">La quantit� de lumi�re �mise par la lampe dans la direction du point �clair�e</param>
         /// <param name="A">Alb�do, ou couleur de la surface. Pour une surface rouge (1, 0, 0)</param>
         /// <returns>Un vecteur contenant l'intensit� de la lumiere</returns>
-        public static Vector3 CalculInstensity(float V, Vector3 N, Vector3 L, Vector3 x, Vector3 y, Vector3 LQ,Vector3 A)
+        public static Vector3 CalculInstensity(float V, Vector3 N, Vector3 L, Vector3 x, Vector3 y, Vector3 LQ, Vector3 A)
         {
             float cosT = Math.Abs(Vector3.Dot(N, L)); // Vector are normalized : magnitude equal 1
             float dist2 = Vector3.Distance(x, y) * Vector3.Distance(x, y);
-            return V * cosT * LQ * A/ (dist2 * (float)Math.PI);
+            return V * cosT * LQ * A / (dist2 * (float)Math.PI);
         }
     }
 }
