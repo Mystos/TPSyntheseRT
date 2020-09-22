@@ -2,6 +2,7 @@ using SFML.Graphics;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 using System.Numerics;
 using System.Xml;
 
@@ -12,15 +13,16 @@ namespace TPSyntheseRT
     {
         static void Main(string[] args)
         {
+
             uint width = 1000;
             uint height = 1000;
-            Image image = new Image(width, height, Color.Cyan);
+            Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
             List<Sphere> sphereList = new List<Sphere>();
             sphereList.Add(new Sphere(new Vector3(0, height / 2, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width, height / 2, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width /2, 0, 400), 200));
             sphereList.Add(new Sphere(new Vector3(width /2, height, 400), 200));
-            Vector3 L = new Vector3(width / 2, height / 2, 300);
+            Vector3 L = new Vector3(width / 2, height / 2, 400);
             float epsilon = 0.1f;
 
             for (uint y = 0; y < height; y++)
@@ -42,24 +44,31 @@ namespace TPSyntheseRT
                             float tL;
                             if (Intersect_Ray_Sphere(rayFromX, sphere, out tL))
                             {
-                                image.SetPixel(x, y, Color.Black);// Ombre
+                                image.SetPixel(x, y, SFML.Graphics.Color.Black);// Ombre
                             }
                             else
                             {
                                 Vector3 N = Vector3.Normalize(Pep - sphere.Center);
-                                Vector3 le = new Vector3(1000, 1000, 1000);
+                                Vector3 le = new Vector3(1000000, 1000000, 1000000);
                                 Vector3 A = new Vector3(1, 0, 0);
                                 Vector3 couleurPix = CalculInstensity(1, N, Vector3.Normalize(L - Pep), Pep, L, le, A);
-
-                                Color col = new Color((byte)couleurPix.X, (byte)couleurPix.Y, (byte)couleurPix.Z);
+                                Color col = CreateColorFromVector(couleurPix);
                                 image.SetPixel(x, y, col); // Lumiere
                             }
                         }
                     }
-                    
                 }
             }
             image.SaveToFile("result.png");
+        }
+        public static Color CreateColorFromVector(Vector3 vectColor)
+        {
+            float maxIntensity = 1;
+ 
+            int r = Math.Clamp((int)(vectColor.X * 255f / maxIntensity), 0,255);
+            int g = Math.Clamp((int)(vectColor.Y * 255f / maxIntensity), 0, 255);
+            int b = Math.Clamp((int)(vectColor.Z * 255f / maxIntensity), 0, 255);
+            return new Color((byte)r, (byte)g, (byte)b, 255);
         }
 
         public static bool SolveQuadratic(ref float a,ref  float b,ref float c,out float x0,out float x1)
@@ -107,7 +116,7 @@ namespace TPSyntheseRT
         }
 
         /// <summary>
-        /// 
+        /// Calcule l'intensité lumineuse d'une surface non mirroir
         /// </summary>
         /// <param name="V">la visibilité entre x et y (i.e. est-ce que x voit y sans obstacle, i.e. 0 ou 1)</param>
         /// <param name="N">N c'est la normal à la surface</param>
@@ -116,12 +125,12 @@ namespace TPSyntheseRT
         /// <param name="y">Point y</param>
         /// <param name="LQ">La quantité de lumière émise par la lampe dans la direction du point éclairée</param>
         /// <param name="A">Albédo, ou couleur de la surface. Pour une surface rouge (1, 0, 0)</param>
-        /// <returns></returns>
+        /// <returns>Un vecteur contenant l'intensité de la lumiere</returns>
         public static Vector3 CalculInstensity(float V, Vector3 N, Vector3 L, Vector3 x, Vector3 y, Vector3 LQ,Vector3 A)
         {
-            float cosT = Math.Abs(Vector3.Dot(N, L));
+            float cosT = Math.Abs(Vector3.Dot(N, L)); // Vector are normalized : magnitude equal 1
             float dist2 = Vector3.Distance(x, y) * Vector3.Distance(x, y);
-            return V * cosT * LQ * A / (dist2 * (float)Math.PI);
+            return V * cosT * LQ * A/ (dist2 * (float)Math.PI);
         }
     }
 }
