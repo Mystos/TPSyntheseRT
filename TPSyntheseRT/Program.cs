@@ -125,16 +125,16 @@ namespace TPSyntheseRT
         }
 
         /// <summary>
-        /// Calcule l'intensité lumineuse d'une surface non mirroir
+        /// Calcule l'intensitï¿½ lumineuse d'une surface non mirroir
         /// </summary>
-        /// <param name="V">la visibilité entre x et y (i.e. est-ce que x voit y sans obstacle, i.e. 0 ou 1)</param>
-        /// <param name="N">N c'est la normal à la surface</param>
-        /// <param name="L">L c'est le vecteur en direction de la lampe (i.e. XY normalisé)</param>
+        /// <param name="V">la visibilitï¿½ entre x et y (i.e. est-ce que x voit y sans obstacle, i.e. 0 ou 1)</param>
+        /// <param name="N">N c'est la normal ï¿½ la surface</param>
+        /// <param name="L">L c'est le vecteur en direction de la lampe (i.e. XY normalisï¿½)</param>
         /// <param name="x">Point x</param>
         /// <param name="y">Point y</param>
-        /// <param name="LQ">La quantité de lumière émise par la lampe dans la direction du point éclairée</param>
-        /// <param name="A">Albédo, ou couleur de la surface. Pour une surface rouge (1, 0, 0)</param>
-        /// <returns>Un vecteur contenant l'intensité de la lumiere</returns>
+        /// <param name="LQ">La quantitï¿½ de lumiï¿½re ï¿½mise par la lampe dans la direction du point ï¿½clairï¿½e</param>
+        /// <param name="A">Albï¿½do, ou couleur de la surface. Pour une surface rouge (1, 0, 0)</param>
+        /// <returns>Un vecteur contenant l'intensitï¿½ de la lumiere</returns>
         public static Vector3 CalculInstensity(float V, Vector3 N, Vector3 L, Vector3 x, Vector3 y, Vector3 LQ,Vector3 A)
         {
             float cosT = Math.Abs(Vector3.Dot(N, L)); // Vector are normalized : magnitude equal 1
