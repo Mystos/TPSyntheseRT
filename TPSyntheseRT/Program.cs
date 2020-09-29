@@ -143,6 +143,9 @@ namespace TPSyntheseRT
                         }
                         break;
                     case SurfaceType.Diffuse:
+
+
+
                         foreach (Lamp lamp in listLamp)
                         {
                             Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
