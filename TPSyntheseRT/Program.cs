@@ -24,41 +24,56 @@ namespace TPSyntheseRT
 
             List<Lamp> listLamp = BuildLamp(width, height);
 
-
             for (uint y = 0; y < height; y++)
             {
                 for (uint x = 0; x < width; x++)
                 {
                     Option option = new Option();
+                    //option.backgroundColor = new Vector3(0, 0, 0);
                     option.cameraType = CameraType.Perspective;
-                    option.maxDepth = 200;
+                    option.maxDepth = 20;
                     Direction dir = new Direction(new Vector3(0, 0, 1));
-
+                    float offsetRay = 0.01f;
                     if (option.cameraType == CameraType.Perspective)
                     {
                         dir = new Direction(new Vector3(x, y, 0) - new Vector3(pointPerspective.X, pointPerspective.Y, pointPerspective.Z));
                     }
 
-                    Ray ray = new Ray(new Position(new Vector3(x, y, 0)), dir);
+                    int raycount = 10;
 
-                    if(CastRay(ray, sphereList, listLamp, option,out Vector3 couleurPix))
+                    Vector3 couleur = Vector3.Zero;
+
+                    for (int i = 0; i < raycount; i++)
                     {
-                        Color col = CreateColorFromVector(couleurPix);
-                        image.SetPixel(x, y, col); // Lumiere
+                        Ray ray = new Ray(new Position(new Vector3(x + GetRandomNumber(-offsetRay, offsetRay), y + GetRandomNumber(-offsetRay, offsetRay), 0)), dir);
+
+                        if (CastRay(ray, sphereList, listLamp, option, out Vector3 couleurPix))
+                        {
+
+                            couleur += couleurPix;
+
+                        }
+                        else
+                        {
+                            couleur += option.backgroundColor;
+
+                        }
                     }
-                    else
-                    {
-                        Color col = new Color((byte)option.backgroundColor.X, (byte)option.backgroundColor.Y, (byte)option.backgroundColor.Z);
-                        image.SetPixel(x, y,col); // ombre
-                    }
 
-
-
+                    Color col = CreateColorFromVector(couleur);
+                    image.SetPixel(x, y, col); // Lumiere
                 }
             }
-            image.SaveToFile("result.png");
+            image.SaveToFile(@"D:\result.png");
         }
 
+
+        ///////////////////////////////////////// RANDOM OPERATIONS /////////////////////////////////////////
+        private static System.Random random = new System.Random();
+        public static float GetRandomNumber(float minimum, float maximum)
+        {
+            return (float)random.NextDouble() * (maximum - minimum) + minimum;
+        }
 
         public static List<Sphere> BuildSphere(uint width, uint height)
         {
@@ -68,7 +83,7 @@ namespace TPSyntheseRT
             listSphere.Add(sphereGrosse);
 
             Sphere sphere1 = new Sphere(new Vector3(width / 2, height / 2, 400), 250, SurfaceType.Reflective);
-            //listSphere.Add(sphere1);
+            listSphere.Add(sphere1);
 
             Sphere sphere2 = new Sphere(new Vector3(0, height / 2, 400), 250);
             sphere2.Albedo = new Vector3(1, 0, 0);
@@ -81,7 +96,8 @@ namespace TPSyntheseRT
             Sphere sphere4 = new Sphere(new Vector3(width / 2, 0, 400), 250);
             listSphere.Add(sphere4);
 
-            Sphere sphere5 = new Sphere(new Vector3(width / 2, height / 2, 800), 250, SurfaceType.Reflective);
+            Sphere sphere5 = new Sphere(new Vector3(width / 2, height, 400), 250, SurfaceType.Metalic);
+            sphere5.Albedo = new Vector3(0, 0, 1);
             listSphere.Add(sphere5);
 
             return listSphere;
@@ -93,13 +109,15 @@ namespace TPSyntheseRT
 
             listLamp.Add(new Lamp(new Vector3(0, 0, 200), new Vector3(1000000, 0, 0)));
             listLamp.Add(new Lamp(new Vector3(width, height - 50, 200), new Vector3(1000000, 1000000, 1000000)));
+            listLamp.Add(new Lamp(new Vector3(width, 0, 200), new Vector3(0, 0, 1000000)));
+
 
             return listLamp;
         }
 
         public static bool CastRay(Ray rayon, List<Sphere> listSphere, List<Lamp> listLamp, Option option, out Vector3 colorHit, uint depth = 0)
         {
-            float epsilon = 0.1f;
+            float epsilon = 0.08f;
             colorHit = new Vector3(0, 0, 0);
 
             if (depth > option.maxDepth)
@@ -139,6 +157,29 @@ namespace TPSyntheseRT
                             }
                         }
                         break;
+
+                    case SurfaceType.Metalic:
+                        Ray reflecRayMetal = new Ray(new Position(pEp), new Direction(CalculReflection(rayon, N)));
+                        if (CastRay(reflecRayMetal, listSphere, listLamp, option, out Vector3 newColor2, depth + 1))
+                        {
+                            colorHit += 0.8f * newColor2;
+                        }
+
+                        foreach (Lamp lamp in listLamp)
+                        {
+                            Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
+
+                            if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, listSphere))
+                            {
+                                colorHit += new Vector3(0, 0, 0);
+                            }
+                            else
+                            {
+                                colorHit += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, hit.sphere.Albedo);
+                            }
+                        }
+
+                        break;
                 }
                 return true;
 
@@ -167,7 +208,6 @@ namespace TPSyntheseRT
             }
             return false;
         }
-
 
         /// <summary>
         /// Donne la premiere intersection

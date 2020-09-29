@@ -28,6 +28,7 @@ namespace TPSyntheseRT
     public enum SurfaceType
     {
         Reflective,
-        Diffuse
+        Diffuse,
+        Metalic
     }
 }

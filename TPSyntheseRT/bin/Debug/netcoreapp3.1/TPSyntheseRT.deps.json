@@ -8,7 +8,8 @@
     ".NETCoreApp,Version=v3.1": {
       "TPSyntheseRT/1.0.0": {
         "dependencies": {
-          "SFML.Net": "2.5.0"
+          "SFML.Net": "2.5.0",
+          "UnityEngine": "0.0.0.0"
         },
         "runtime": {
           "TPSyntheseRT.dll": {}
@@ -365,6 +366,14 @@
             "fileVersion": "2.5.0.0"
           }
         }
+      },
+      "UnityEngine/0.0.0.0": {
+        "runtime": {
+          "UnityEngine.dll": {
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
       }
     }
   },
@@ -415,6 +424,11 @@
       "sha512": "sha512-KuQvC0TrsxzhFJw9hDvMAzKD8/12jvXjP7sC3UO5MSM0sy5sfYNTqQktnQ3ELAV+rP1cqRKLsvosBfMfl1HkRw==",
       "path": "sfml.window/2.5.0",
       "hashPath": "sfml.window.2.5.0.nupkg.sha512"
+    },
+    "UnityEngine/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
     }
   }
 }

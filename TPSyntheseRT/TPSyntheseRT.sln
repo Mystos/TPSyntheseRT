@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TPSyntheseRT", "TPSyntheseRT.csproj", "{7682A4BF-88D5-49FF-A75D-158CFBD7B251}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TPSyntheseRTTests", "..\TPSyntheseRTTests\TPSyntheseRTTests.csproj", "{A06BEBE2-858D-4385-BDDA-24ACB4D6888B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TPSyntheseRT", "TPSyntheseRT.csproj", "{7682A4BF-88D5-49FF-A75D-158CFBD7B251}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{7682A4BF-88D5-49FF-A75D-158CFBD7B251}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7682A4BF-88D5-49FF-A75D-158CFBD7B251}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7682A4BF-88D5-49FF-A75D-158CFBD7B251}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A06BEBE2-858D-4385-BDDA-24ACB4D6888B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A06BEBE2-858D-4385-BDDA-24ACB4D6888B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A06BEBE2-858D-4385-BDDA-24ACB4D6888B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A06BEBE2-858D-4385-BDDA-24ACB4D6888B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
