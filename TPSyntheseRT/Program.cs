@@ -144,19 +144,29 @@ namespace TPSyntheseRT
                         break;
                     case SurfaceType.Diffuse:
 
-
+                        Vector3 pointRandomLamp;
 
                         foreach (Lamp lamp in listLamp)
                         {
-                            Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
+                            if (lamp.radius > 0)
+                            {
+                                Vector3 offset = new Vector3(GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius));
+                                pointRandomLamp = lamp.position + offset;
+                            }
+                            else
+                            {
+                                pointRandomLamp = lamp.position;
+                            }
 
-                            if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, listSphere))
+                            Ray rayFromX = new Ray(new Position(pEp), new Direction(pointRandomLamp - pEp));
+
+                            if (IsThereAnIntersectionBetweenAandB(pEp, pointRandomLamp, listSphere))
                             {
                                 colorHit += new Vector3(0, 0, 0);
                             }
                             else
                             {
-                                colorHit += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, hit.sphere.Albedo);
+                                colorHit += CalculInstensity(1, N, Vector3.Normalize(pointRandomLamp - pEp), pEp, pointRandomLamp, lamp.le, hit.sphere.Albedo);
                             }
                         }
                         break;
@@ -168,17 +178,30 @@ namespace TPSyntheseRT
                             colorHit += 0.8f * newColor2;
                         }
 
+                        Vector3 pointRandomLampMetal;
+
                         foreach (Lamp lamp in listLamp)
                         {
-                            Ray rayFromX = new Ray(new Position(pEp), new Direction(lamp.position - pEp));
 
-                            if (IsThereAnIntersectionBetweenAandB(pEp, lamp.position, listSphere))
+                            if (lamp.radius > 0)
+                            {
+                                Vector3 offset = new Vector3(GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius));
+                                pointRandomLampMetal = lamp.position + offset;
+                            }
+                            else
+                            {
+                                pointRandomLampMetal = lamp.position;
+                            }
+
+                            Ray rayFromX = new Ray(new Position(pEp), new Direction(pointRandomLampMetal - pEp));
+
+                            if (IsThereAnIntersectionBetweenAandB(pEp, pointRandomLampMetal, listSphere))
                             {
                                 colorHit += new Vector3(0, 0, 0);
                             }
                             else
                             {
-                                colorHit += CalculInstensity(1, N, Vector3.Normalize(lamp.position - pEp), pEp, lamp.position, lamp.le, hit.sphere.Albedo);
+                                colorHit += CalculInstensity(1, N, Vector3.Normalize(pointRandomLampMetal - pEp), pEp, pointRandomLampMetal, lamp.le, hit.sphere.Albedo);
                             }
                         }
 
