@@ -33,7 +33,7 @@ namespace TPSyntheseRT
                     option.cameraType = CameraType.Perspective;
                     option.maxDepth = 20;
                     Direction dir = new Direction(new Vector3(0, 0, 1));
-                    float offsetRay = 0.01f;
+                    float offsetRay = 0.5f;
                     if (option.cameraType == CameraType.Perspective)
                     {
                         dir = new Direction(new Vector3(x, y, 0) - new Vector3(pointPerspective.X, pointPerspective.Y, pointPerspective.Z));
@@ -107,9 +107,9 @@ namespace TPSyntheseRT
         {
             List<Lamp> listLamp = new List<Lamp>();
 
-            listLamp.Add(new Lamp(new Vector3(0, 0, 200), new Vector3(1000000, 0, 0)));
-            listLamp.Add(new Lamp(new Vector3(width, height - 50, 200), new Vector3(1000000, 1000000, 1000000)));
-            listLamp.Add(new Lamp(new Vector3(width, 0, 200), new Vector3(0, 0, 1000000)));
+            listLamp.Add(new Lamp(new Vector3(0, 0, 200), new Vector3(10000000, 0, 0)));
+            listLamp.Add(new Lamp(new Vector3(width, height - 50, 200), new Vector3(10000000, 10000000, 10000000)));
+            listLamp.Add(new Lamp(new Vector3(width, 0, 200), new Vector3(0, 0, 10000000)));
 
 
             return listLamp;
