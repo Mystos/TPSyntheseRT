@@ -60,7 +60,7 @@ namespace TPSyntheseRT
                         }
                     }
 
-                    Color col = CreateColorFromVector(couleur);
+                    Color col = CreateColorFromVector(couleur / raycount);
                     image.SetPixel(x, y, col); // Lumiere
                 }
             }
