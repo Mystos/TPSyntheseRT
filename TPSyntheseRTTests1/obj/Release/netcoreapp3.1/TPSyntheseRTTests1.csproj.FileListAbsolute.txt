@@ -1,0 +1,4 @@
+D:\VisualStudio Project\TPSyntheseRT\TPSyntheseRTTests1\obj\Release\netcoreapp3.1\TPSyntheseRTTests1.csprojAssemblyReference.cache
+D:\VisualStudio Project\TPSyntheseRT\TPSyntheseRTTests1\obj\Release\netcoreapp3.1\TPSyntheseRTTests1.AssemblyInfoInputs.cache
+D:\VisualStudio Project\TPSyntheseRT\TPSyntheseRTTests1\obj\Release\netcoreapp3.1\TPSyntheseRTTests1.AssemblyInfo.cs
+D:\VisualStudio Project\TPSyntheseRT\TPSyntheseRTTests1\obj\Release\netcoreapp3.1\TPSyntheseRTTests1.csproj.CoreCompileInputs.cache
