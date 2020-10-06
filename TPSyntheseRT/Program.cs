@@ -39,7 +39,7 @@ namespace TPSyntheseRT
                         dir = new Direction(new Vector3(x, y, 0) - new Vector3(pointPerspective.X, pointPerspective.Y, pointPerspective.Z));
                     }
 
-                    int raycount = 10;
+                    int raycount = 1;
 
                     Vector3 couleur = Vector3.Zero;
 
