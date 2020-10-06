@@ -21,6 +21,31 @@ namespace TPSyntheseRT
             this.start = Vector3.Min(sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), start);
             this.end = Vector3.Max(sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), end);
         }
+        public static Box UnionBox(List<Sphere> listSphere)
+        {
+            if (listSphere.Count <= 0)
+            {
+                return null;
+            }
+            Vector3 start = listSphere[0].Center;
+            Vector3 end = listSphere[0].Center;
 
+            foreach (Sphere sphere in listSphere)
+            {
+                start = Vector3.Min(sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), start);
+                end = Vector3.Max(sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), end);
+            }
+
+            Vector3 diag = end - start;
+
+            //// Permet de créer le cube englobant
+            //float maxLength = Mathf.Max(diag.x, diag.y, diag.z);
+            //end.x += maxLength - diag.x;
+            //end.y += maxLength - diag.y;
+            //end.z += maxLength - diag.z;
+            ////////////////////////////////////////////
+
+            return new Box(start, end);
+        }
     }
 }
