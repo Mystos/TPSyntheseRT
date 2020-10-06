@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Text;
@@ -46,6 +46,15 @@ namespace TPSyntheseRT
             ////////////////////////////////////////////
 
             return new Box(start, end);
+        }
+
+        public override bool Equals(object obj)
+        {
+            Box box = obj as Box;
+            if (box == null)
+                return false;
+            else
+                return base.Equals(box.start == this.start && box.end == this.end);
         }
     }
 }
