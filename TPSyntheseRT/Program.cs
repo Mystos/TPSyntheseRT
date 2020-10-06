@@ -79,38 +79,6 @@ namespace TPSyntheseRT
         {
             List<Sphere> listSphere = new List<Sphere>();
 
-<<<<<<< HEAD
-            //Sphere sphereGrosse = new Sphere(new Vector3(width / 2, 100000 + height, 800), 100000);
-            //listSphere.Add(sphereGrosse);
-            //Sphere sphereMur1 = new Sphere(new Vector3(width / 2, height / 2, 10000 + 1000), 10000);
-=======
-            Sphere sphereGrosse = new Sphere(new Vector3(width / 2, 10000 + height, 800), 10000);
-            listSphere.Add(sphereGrosse);
-
-            Sphere sphereMur1 = new Sphere(new Vector3(width / 2, height / 2, 10000 + 1000), 10000);
-            listSphere.Add(sphereMur1);
-            //Sphere sphereMur2 = new Sphere(new Vector3(height / 2 , 100000 + height, 800), 100000);
->>>>>>> master
-            //listSphere.Add(sphereMur1);
-            //Sphere sphereMur2 = new Sphere(new Vector3(width + 100000 , height / 2, 500), 100000);
-            //listSphere.Add(sphereMur2);
-
-            //Sphere sphere1 = new Sphere(new Vector3(width / 2 + 200, 250, 700), 150, SurfaceType.Reflective);
-            //listSphere.Add(sphere1);
-            //Sphere sphere2 = new Sphere(new Vector3(width  - 200, height - 200, 500), 200);
-            //sphere2.Albedo = new Vector3(1, 0, 0);
-            //listSphere.Add(sphere2);
-
-            ////Sphere sphere3 = new Sphere(new Vector3(width, height / 2, 400), 250);
-            ////sphere3.Albedo = new Vector3(0, 0, 1);
-            ////listSphere.Add(sphere3);
-
-            ////Sphere sphere4 = new Sphere(new Vector3(width / 2, 0, 400), 250);
-            ////listSphere.Add(sphere4);
-
-            //Sphere sphere5 = new Sphere(new Vector3(width / 2, height / 2 + 100, 600), 150, SurfaceType.Metalic);
-            //sphere5.Albedo = new Vector3(0, 0, 1);
-            //listSphere.Add(sphere5);
 
             for (int i = 0; i < 10000; i++)
             {
