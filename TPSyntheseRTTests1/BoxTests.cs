@@ -7,6 +7,7 @@ using System.Numerics;
 
 namespace TPSyntheseRT.Tests
 {
+    [TestClass()]
     public class BoxTests
     {
         [TestMethod()]
@@ -22,6 +23,17 @@ namespace TPSyntheseRT.Tests
 
             Assert.AreEqual(box2, uBox);
 
+            Assert.Fail();
+        }
+
+        [TestMethod()]
+        public void BoxTest()
+        {
+            Sphere sphere = new Sphere(new Vector3(0, 0, 0), 1);
+            Box box1 = new Box(sphere);
+            Box testBox = new Box(new Vector3(-1,-1,-1), Vector3.One);
+=
+            Assert.AreEqual(testBox, box1);
             Assert.Fail();
         }
     }
