@@ -117,10 +117,9 @@ namespace TPSyntheseRT
         {
             List<Lamp> listLamp = new List<Lamp>();
 
-            listLamp.Add(new Lamp(new Vector3(0, 0, 200), new Vector3(10000000, 0, 0)));
-            listLamp.Add(new Lamp(new Vector3(width, height - 50, 200), new Vector3(10000000, 10000000, 10000000)));
-            listLamp.Add(new Lamp(new Vector3(width, 0, 200), new Vector3(0, 0, 10000000)));
-
+            listLamp.Add(new Lamp(new Vector3(0, 0, 800), new Vector3(1000000, 0, 0)));
+            listLamp.Add(new Lamp(new Vector3(width / 2, 0, 500), new Vector3(1000000, 1000000, 1000000)));
+            listLamp.Add(new Lamp(new Vector3(width - 100, 0, 200), new Vector3(0, 0, 1000000)));
 
             return listLamp;
         }
