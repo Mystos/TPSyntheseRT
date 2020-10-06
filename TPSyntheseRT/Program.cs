@@ -321,6 +321,50 @@ namespace TPSyntheseRT
             return result;
         }
 
+        public static bool Intersect_Ray_Box(Ray ray, Box box, out float t)
+        {
+            float tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+            tmin = (box.start.X - ray.StartPosition.Origin.X) * ray.InvDirection.Dir.X;
+            tmax = (box.end.X - ray.StartPosition.Origin.X) * ray.InvDirection.Dir.X;
+            tymin = (box.start.Y - ray.StartPosition.Origin.Y) * ray.InvDirection.Dir.Y;
+            tymax = (box.end.Y - ray.StartPosition.Origin.Y) * ray.InvDirection.Dir.Y;
+
+            t = tmin;
+
+            if((tmin > tymax) || (tymin > tmax))
+            {
+                return false;
+            }
+            if(tymin > tmin)
+            {
+                tmin = tymin;
+            }
+            if(tymax < tmax)
+            {
+                tmax = tymax;
+            }
+
+            tzmin = (box.start.Z - ray.StartPosition.Origin.Z) * ray.InvDirection.Dir.Z;
+            tzmax = (box.end.Z - ray.StartPosition.Origin.Z) * ray.InvDirection.Dir.Z;
+
+            if((tmin > tzmax) || (tzmin > tmax))
+            {
+                return false;
+            }
+            if (tzmin > tmin)
+            {
+                tmin = tzmin;
+            }
+            if(tzmax < tmax)
+            {
+                tmax = tzmax;
+            }
+
+            return true;
+
+        }
+
         /// <summary>
         /// Calcule l'intensit� lumineuse d'une surface non mirroir
         /// </summary>
