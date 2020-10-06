@@ -16,5 +16,11 @@ namespace TPSyntheseRT
             this.end = _end;
         }
 
+        public Box(Sphere sphere)
+        {
+            this.start = Vector3.Min(sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), start);
+            this.end = Vector3.Max(sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), end);
+        }
+
     }
 }
