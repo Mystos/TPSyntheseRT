@@ -21,6 +21,26 @@ namespace TPSyntheseRT
             this.start = Vector3.Min(sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), start);
             this.end = Vector3.Max(sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), end);
         }
+
+        public static Box UnionBox(IList<Box> listBox)
+        {
+            if (listBox.Count <= 0)
+            {
+                return null;
+            }
+            Vector3 start = listBox[0].start;
+            Vector3 end = listBox[0].end;
+
+            foreach (Box box in listBox)
+            {
+                start = Vector3.Min(box.start, start);
+                end = Vector3.Max(box.end, end);
+            }
+
+            return new Box(start, end);
+
+        }
+
         public static Box UnionBox(List<Sphere> listSphere)
         {
             if (listSphere.Count <= 0)
