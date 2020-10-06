@@ -22,8 +22,7 @@ namespace TPSyntheseRT.Tests
             Box uBox = Box.UnionBox(new Box[] { box1, box2 });
 
             Assert.AreEqual(box2, uBox);
-
-            Assert.Fail();
+            
         }
 
         [TestMethod()]
@@ -31,10 +30,9 @@ namespace TPSyntheseRT.Tests
         {
             Sphere sphere = new Sphere(new Vector3(0, 0, 0), 1);
             Box box1 = new Box(sphere);
-            Box testBox = new Box(new Vector3(-1,-1,-1), Vector3.One);
-=
+            Box testBox = new Box(new Vector3(-1, -1, -1), Vector3.One);
             Assert.AreEqual(testBox, box1);
-            Assert.Fail();
+
         }
     }
 }

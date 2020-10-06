@@ -17,7 +17,7 @@ namespace TPSyntheseRT
 
             uint width = 1000;
             uint height = 1000;
-            Vector3 pointPerspective = new Vector3(width / 2, height / 2, -5000);
+            Vector3 pointPerspective = new Vector3(width / 2, height / 2, -500);
             Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
 
             List<Sphere> sphereList = BuildSphere(width, height);
@@ -31,7 +31,7 @@ namespace TPSyntheseRT
                     Option option = new Option();
                     //option.backgroundColor = new Vector3(0, 0, 0);
                     option.cameraType = CameraType.Perspective;
-                    option.maxDepth = 20;
+                    option.maxDepth = 5;
                     Direction dir = new Direction(new Vector3(0, 0, 1));
                     float offsetRay = 0.5f;
                     if (option.cameraType == CameraType.Perspective)
@@ -39,7 +39,7 @@ namespace TPSyntheseRT
                         dir = new Direction(new Vector3(x, y, 0) - new Vector3(pointPerspective.X, pointPerspective.Y, pointPerspective.Z));
                     }
 
-                    int raycount = 1;
+                    int raycount = 10;
 
                     Vector3 couleur = Vector3.Zero;
 
@@ -69,7 +69,7 @@ namespace TPSyntheseRT
 
 
         ///////////////////////////////////////// RANDOM OPERATIONS /////////////////////////////////////////
-        private static System.Random random = new System.Random();
+        private static System.Random random = new System.Random(4587);
         public static float GetRandomNumber(float minimum, float maximum)
         {
             return (float)random.NextDouble() * (maximum - minimum) + minimum;
@@ -79,10 +79,19 @@ namespace TPSyntheseRT
         {
             List<Sphere> listSphere = new List<Sphere>();
 
+            Sphere sphereGrosse = new Sphere(new Vector3(width / 2, 10000 + height, 800), 10000);
+            listSphere.Add(sphereGrosse);
 
-            for (int i = 0; i < 10000; i++)
+            Sphere sphereMur1 = new Sphere(new Vector3(width / 2, height / 2, 10000 + 1000), 10000);
+            listSphere.Add(sphereMur1);
+
+            Sphere sphereMur2 = new Sphere(new Vector3(width + 10000, height / 2, 0), 10000);
+            listSphere.Add(sphereMur2);
+
+            for (int i = 0; i < 5; i++)
             {
-                Sphere sphere = new Sphere(new Vector3(GetRandomNumber(0,width), GetRandomNumber(0, height), GetRandomNumber(0, 1000)), 1);
+                Sphere sphere = new Sphere(new Vector3(GetRandomNumber(0,width), GetRandomNumber(0, height), GetRandomNumber(0, 1000)), 10);
+                
                 listSphere.Add(sphere);
             }
 
@@ -323,45 +332,25 @@ namespace TPSyntheseRT
 
         public static bool Intersect_Ray_Box(Ray ray, Box box, out float t)
         {
-            float tmin, tmax, tymin, tymax, tzmin, tzmax;
+            float t1 = (box.start.X - ray.StartPosition.Origin.X) * ray.InvDirection.Dir.X;
+            float t2 = (box.end.X - ray.StartPosition.Origin.X) * ray.InvDirection.Dir.X;
+            float t3 = (box.start.Y - ray.StartPosition.Origin.Y) * ray.InvDirection.Dir.Y;
+            float t4 = (box.end.Y - ray.StartPosition.Origin.Y) * ray.InvDirection.Dir.Y;
+            float t5 = (box.start.Z - ray.StartPosition.Origin.Z) * ray.InvDirection.Dir.Z;
+            float t6 = (box.end.Z - ray.StartPosition.Origin.Z) * ray.InvDirection.Dir.Z;
 
-            tmin = (box.start.X - ray.StartPosition.Origin.X) * ray.InvDirection.Dir.X;
-            tmax = (box.end.X - ray.StartPosition.Origin.X) * ray.InvDirection.Dir.X;
-            tymin = (box.start.Y - ray.StartPosition.Origin.Y) * ray.InvDirection.Dir.Y;
-            tymax = (box.end.Y - ray.StartPosition.Origin.Y) * ray.InvDirection.Dir.Y;
+            float tmin = Math.Max(Math.Max(Math.Min(t1, t2), Math.Min(t3, t4)), Math.Min(t5, t6));
+            float tmax   = Math.Min(Math.Min(Math.Max(t1, t2), Math.Max(t3, t4)), Math.Max(t5, t6));
 
+            tmin = Math.Max(tmin, 0f);
             t = tmin;
 
-            if((tmin > tymax) || (tymin > tmax))
+            if (tmax > tmin)
             {
-                return false;
-            }
-            if(tymin > tmin)
-            {
-                tmin = tymin;
-            }
-            if(tymax < tmax)
-            {
-                tmax = tymax;
+                return true;
             }
 
-            tzmin = (box.start.Z - ray.StartPosition.Origin.Z) * ray.InvDirection.Dir.Z;
-            tzmax = (box.end.Z - ray.StartPosition.Origin.Z) * ray.InvDirection.Dir.Z;
-
-            if((tmin > tzmax) || (tzmin > tmax))
-            {
-                return false;
-            }
-            if (tzmin > tmin)
-            {
-                tmin = tzmin;
-            }
-            if(tzmax < tmax)
-            {
-                tmax = tzmax;
-            }
-
-            return true;
+            return false;
 
         }
 
@@ -382,5 +371,6 @@ namespace TPSyntheseRT
             float dist2 = Vector3.Distance(x, y) * Vector3.Distance(x, y);
             return V * cosT * LQ * A / (dist2 * (float)Math.PI);
         }
+
     }
 }

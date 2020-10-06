@@ -11,9 +11,9 @@ namespace TPSyntheseRT
         private Position startPosition;
         private Direction direction;
         private Direction invDirection;
-        private int[] signs;
-
+        
         public Direction Direction { get => direction; set => direction = value; }
+        public Direction InvDirection { get => invDirection; set => invDirection = value; }
         public Position StartPosition { get => startPosition; set => startPosition = value; }
 
         /// <summary>
@@ -28,9 +28,6 @@ namespace TPSyntheseRT
             this.direction = direction;
 
             this.invDirection = new Direction(Direction.Invert(this.direction.Dir));
-            this.signs[0] = Math.Sign(invDirection.direction.X);
-            this.signs[1] = Math.Sign(invDirection.direction.Y);
-            this.signs[2] = Math.Sign(invDirection.direction.Z);
         }
 
 
@@ -51,7 +48,7 @@ namespace TPSyntheseRT
     }
     public class Direction
     {
-        public  Vector3 direction;
+        private  Vector3 direction;
 
         public Vector3 Dir { get => direction; set => direction = value; }
 

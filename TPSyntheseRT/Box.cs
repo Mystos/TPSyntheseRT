@@ -7,8 +7,8 @@ namespace TPSyntheseRT
 {
     public class Box
     {
-        Vector3 start;
-        Vector3 end;
+       public Vector3 start;
+       public Vector3 end;
 
         public Box(Vector3 _start, Vector3 _end)
         {
@@ -18,8 +18,8 @@ namespace TPSyntheseRT
 
         public Box(Sphere sphere)
         {
-            this.start = Vector3.Min(sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), start);
-            this.end = Vector3.Max(sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), end);
+            this.start = sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius);
+            this.end =sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius);
         }
 
         public static Box UnionBox(IList<Box> listBox)
@@ -74,7 +74,7 @@ namespace TPSyntheseRT
             if (box == null)
                 return false;
             else
-                return base.Equals(box.start == this.start && box.end == this.end);
+                return box.start == this.start && box.end == this.end; 
         }
     }
 }
