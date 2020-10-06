@@ -10,6 +10,8 @@ namespace TPSyntheseRT
     {
         private Position startPosition;
         private Direction direction;
+        private Direction invDirection;
+        private int[] signs;
 
         public Direction Direction { get => direction; set => direction = value; }
         public Position StartPosition { get => startPosition; set => startPosition = value; }
@@ -24,8 +26,17 @@ namespace TPSyntheseRT
             this.startPosition = startPosition;
             direction.Dir = Vector3.Normalize(direction.Dir);
             this.direction = direction;
+
+            this.invDirection = new Direction(Direction.Invert(this.direction.Dir));
+            this.signs[0] = Math.Sign(invDirection.direction.X);
+            this.signs[1] = Math.Sign(invDirection.direction.Y);
+            this.signs[2] = Math.Sign(invDirection.direction.Z);
         }
+
+
     }
+
+
 
     public class Position
     {
@@ -40,13 +51,21 @@ namespace TPSyntheseRT
     }
     public class Direction
     {
-        private Vector3 direction;
+        public  Vector3 direction;
 
         public Vector3 Dir { get => direction; set => direction = value; }
 
         public Direction(Vector3 direction)
         {
             this.direction = direction;
+        }
+
+        /// <summary>
+        /// Inverts a scale vector by dividing 1 by each component
+        /// </summary>
+        public static Vector3 Invert(Vector3 vec)
+        {
+            return new Vector3(1 / vec.X, 1 / vec.Y, 1 / vec.Z);
         }
     }
 }
