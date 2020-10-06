@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TPSyntheseRT
 {
-    class Box
+    public class Box
     {
         Vector3 start;
         Vector3 end;
