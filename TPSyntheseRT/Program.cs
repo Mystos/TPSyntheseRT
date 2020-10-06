@@ -79,9 +79,18 @@ namespace TPSyntheseRT
         {
             List<Sphere> listSphere = new List<Sphere>();
 
+<<<<<<< HEAD
             //Sphere sphereGrosse = new Sphere(new Vector3(width / 2, 100000 + height, 800), 100000);
             //listSphere.Add(sphereGrosse);
             //Sphere sphereMur1 = new Sphere(new Vector3(width / 2, height / 2, 10000 + 1000), 10000);
+=======
+            Sphere sphereGrosse = new Sphere(new Vector3(width / 2, 10000 + height, 800), 10000);
+            listSphere.Add(sphereGrosse);
+
+            Sphere sphereMur1 = new Sphere(new Vector3(width / 2, height / 2, 10000 + 1000), 10000);
+            listSphere.Add(sphereMur1);
+            //Sphere sphereMur2 = new Sphere(new Vector3(height / 2 , 100000 + height, 800), 100000);
+>>>>>>> master
             //listSphere.Add(sphereMur1);
             //Sphere sphereMur2 = new Sphere(new Vector3(width + 100000 , height / 2, 500), 100000);
             //listSphere.Add(sphereMur2);
