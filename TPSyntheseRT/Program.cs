@@ -234,15 +234,22 @@ namespace TPSyntheseRT
 
         public static bool IsThereAnIntersectionBetweenAandB(Vector3 a, Vector3 b, List<Sphere> scene)
         {
+            float minDistance = float.MaxValue;
+            bool foundIntersection = false;
             Ray ray = new Ray(new Position(a), new Direction(b - a));
             foreach (Sphere sphere in scene)
             {
-                if (Intersect_Ray_Sphere(ray, sphere, out _))
+                if (Intersect_Ray_Sphere(ray, sphere, out float distance))
                 {
-                    return true;
+                    if(distance < minDistance && distance <= (b-a).Length())
+                    {
+                        minDistance = distance;
+                        foundIntersection = true;
+
+                    }
                 }
             }
-            return false;
+            return foundIntersection;
         }
 
         /// <summary>
