@@ -9,7 +9,7 @@ namespace TPSyntheseRT
 {
     public class OFFReader
     {
-        public static void ReadFile(string path, out List<Vector3> listVertex, out List<int> listIndices)
+        public static void ReadFile(string path, out List<Vector3> listVertex, out List<int> listIndices, float scale = 1)
         {
             FileStream fs = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
             //BufferedStream bs = new BufferedStream(fs);
@@ -49,7 +49,7 @@ namespace TPSyntheseRT
                     double x = double.Parse(vector[0], format);
                     double y = double.Parse(vector[1], format);
                     double z = double.Parse(vector[2], format);
-                    listVertex.Add(new Vector3((float)x, (float)y, (float)z));
+                    listVertex.Add(new Vector3((float)x * scale, (float)y * scale, (float)z * scale));
                 }
                 else if (i > nbVertex + 1 && i <= nbVertex + nbFace + 1)
                 {
