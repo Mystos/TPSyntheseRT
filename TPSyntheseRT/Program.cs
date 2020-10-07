@@ -433,5 +433,58 @@ namespace TPSyntheseRT
             return V * cosT * LQ * A / (dist2 * (float)Math.PI);
         }
 
+        public static void GetMeshFromSphere(Sphere sphere, int meridian, int parallel, out List<Vector3> listVertex,out List<int> listIndex)
+        {
+            float x, y, z, theta, phi;
+
+            listVertex = new List<Vector3>();
+
+            for (int p = 0; p <= parallel; p++)
+            {
+                phi = p * (float)Math.PI / parallel;
+
+                for (int m = 0; m <= meridian; m++)
+                {
+                    theta = m * 2 * (float)Math.PI / meridian;
+                    x = sphere.radius * (float)Math.Sin(phi) * (float)Math.Cos(theta);
+                    y = sphere.radius * (float)Math.Sin(phi) * (float)Math.Sin(theta);
+                    z = sphere.radius * (float)Math.Cos(phi);
+
+                    listVertex.Add(new Vector3(x + sphere.center.X, y + sphere.center.Y, z + sphere.center.Z));
+                }
+            }
+
+            listIndex = GenIndices(meridian,parallel);
+        }
+        
+        private static List<int> GenIndices(int meridian, int parallel )
+        {
+            List<int> indices = new List<int>();
+            int k1, k2;
+            for (int i = 0; i < parallel; i++)
+            {
+                k1 = i * (meridian + 1);
+                k2 = k1 + meridian + 1;
+
+                for (int j = 0; j < meridian; j++, k1++, k2++)
+                {
+                    if (i != 0)
+                    {
+                        indices.Add(k1);
+                        indices.Add(k2);
+                        indices.Add(k1 + 1);
+                    }
+
+                    if (i != parallel - 1)
+                    {
+                        indices.Add(k1 + 1);
+                        indices.Add(k2);
+                        indices.Add(k2 + 1);
+                    }
+                }
+            }
+
+            return indices;
+        }
     }
 }
