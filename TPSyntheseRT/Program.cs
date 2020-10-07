@@ -1,4 +1,5 @@
 using SFML.Graphics;
+using SFML.Graphics.Glsl;
 using SFML.System;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Xml;
 using System.Xml.Schema;
+using Unity.Collections.LowLevel.Unsafe;
 
 namespace TPSyntheseRT
 {
@@ -19,15 +21,24 @@ namespace TPSyntheseRT
 
             uint width = 1000;
             uint height = 1000;
-            Vector3 pointPerspective = new Vector3(width / 2, height / 2, -500);
+            Vector3 pointPerspective = new Vector3(width / 2, height / 2, -5000);
             Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
 
-            List<Sphere> sphereList = BuildSphere(width, height);
+            Scene mainScene = new Scene();
+            foreach(Sphere sphere in BuildSphere(width, height))
+            {
+                mainScene.objectsInScene.Add(sphere);
+            }
+            Sphere sphereCentre = new Sphere(new Vector3(width / 2, height / 2, 800), 200);
+            GetMeshFromSphere(sphereCentre, 10, 10, out List<Vector3> listVerticies, out List<int> listIndexes);
+            Polygone poly = new Polygone(listVerticies, listIndexes);
+            mainScene.objectsInScene.Add(poly);
 
 
-            OFFReader.ReadFile(@"D:\bunny.off", out List<Vector3> listVertex, out List<int> listIndex);
+            //Polygone poly = new Polygone();
+            //OFFReader.ReadFile(@"D:\bunny.off", out poly.listVerticies, out poly.listIndexes, 100);
 
-            List<Lamp> listLamp = BuildLamp(width, height);
+            mainScene.lamps.AddRange(BuildLamp(width, height));
 
             for (uint y = 0; y < height; y++)
             {
@@ -44,7 +55,7 @@ namespace TPSyntheseRT
                         dir = new Direction(new Vector3(x, y, 0) - new Vector3(pointPerspective.X, pointPerspective.Y, pointPerspective.Z));
                     }
 
-                    int raycount = 10;
+                    int raycount = 1;
 
                     Vector3 couleur = Vector3.Zero;
 
@@ -52,7 +63,7 @@ namespace TPSyntheseRT
                     {
                         Ray ray = new Ray(new Position(new Vector3(x + GetRandomNumber(-offsetRay, offsetRay), y + GetRandomNumber(-offsetRay, offsetRay), 0)), dir);
 
-                        if (CastRay(ray, sphereList, listLamp, option, out Vector3 couleurPix))
+                        if (CastRay(ray, mainScene, option, out Vector3 couleurPix))
                         {
 
                             couleur += couleurPix;
@@ -93,12 +104,12 @@ namespace TPSyntheseRT
             Sphere sphereMur2 = new Sphere(new Vector3(width + 10000, height / 2, 0), 10000);
             listSphere.Add(sphereMur2);
 
-            for (int i = 0; i < 5; i++)
-            {
-                Sphere sphere = new Sphere(new Vector3(GetRandomNumber(0,width), GetRandomNumber(0, height), GetRandomNumber(0, 1000)), 10);
-                
-                listSphere.Add(sphere);
-            }
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    Sphere sphere = new Sphere(new Vector3(GetRandomNumber(0, width), GetRandomNumber(0, height), GetRandomNumber(0, 1000)), 50);
+
+            //    listSphere.Add(sphere);
+            //}
 
 
             return listSphere;
@@ -115,7 +126,7 @@ namespace TPSyntheseRT
             return listLamp;
         }
 
-        public static bool CastRay(Ray rayon, List<Sphere> listSphere, List<Lamp> listLamp, Option option, out Vector3 colorHit, uint depth = 0)
+        public static bool CastRay(Ray rayon, Scene mainScene, Option option, out Vector3 colorHit, uint depth = 0)
         {
             float epsilon = 0.08f;
             colorHit = new Vector3(0, 0, 0);
@@ -126,86 +137,48 @@ namespace TPSyntheseRT
                 return true;
             }
 
-            if (GetFirstIntersectionInScene(listSphere, rayon, out Hit hit))
+            if (GetFirstIntersectionInScene(mainScene, rayon, out Hit hit))
             {
+               
                 // On renvoie un rayon depuis xPos vers L
                 Vector3 pEp = hit.position - epsilon * rayon.Direction.Dir;
-                Vector3 N = Vector3.Normalize(pEp - hit.sphere.Center);
+                Vector3 N = Vector3.Normalize(pEp - hit.obj.center);
 
-                switch (hit.sphere.Type)
+                if(hit.obj.type == SurfaceType.Reflective || hit.obj.type == SurfaceType.Metalic)
                 {
-                    case SurfaceType.Reflective:
+                    Ray reflecRay = new Ray(new Position(pEp), new Direction(CalculReflection(rayon, N)));
+                    if (CastRay(reflecRay, mainScene, option, out Vector3 newColor, depth + 1))
+                    {
+                        colorHit += 0.8f * newColor;
+                    }
+                }
+                if(hit.obj.type == SurfaceType.Diffuse || hit.obj.type == SurfaceType.Metalic)
+                {
+                    Vector3 pointRandomLamp;
 
-                        Ray reflecRay = new Ray(new Position(pEp), new Direction(CalculReflection(rayon, N)));
-                        if (CastRay(reflecRay, listSphere, listLamp, option, out Vector3 newColor, depth + 1))
+                    foreach (Lamp lamp in mainScene.lamps)
+                    {
+                        if (lamp.radius > 0)
                         {
-                            colorHit += 0.8f * newColor;
+                            Vector3 offset = new Vector3(GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius));
+                            pointRandomLamp = lamp.position + offset;
                         }
-                        break;
-                    case SurfaceType.Diffuse:
-
-                        Vector3 pointRandomLamp;
-
-                        foreach (Lamp lamp in listLamp)
+                        else
                         {
-                            if (lamp.radius > 0)
-                            {
-                                Vector3 offset = new Vector3(GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius));
-                                pointRandomLamp = lamp.position + offset;
-                            }
-                            else
-                            {
-                                pointRandomLamp = lamp.position;
-                            }
-
-                            Ray rayFromX = new Ray(new Position(pEp), new Direction(pointRandomLamp - pEp));
-
-                            if (IsThereAnIntersectionBetweenAandB(pEp, pointRandomLamp, listSphere))
-                            {
-                                colorHit += new Vector3(0, 0, 0);
-                            }
-                            else
-                            {
-                                colorHit += CalculInstensity(1, N, Vector3.Normalize(pointRandomLamp - pEp), pEp, pointRandomLamp, lamp.le, hit.sphere.Albedo);
-                            }
-                        }
-                        break;
-
-                    case SurfaceType.Metalic:
-                        Ray reflecRayMetal = new Ray(new Position(pEp), new Direction(CalculReflection(rayon, N)));
-                        if (CastRay(reflecRayMetal, listSphere, listLamp, option, out Vector3 newColor2, depth + 1))
-                        {
-                            colorHit += 0.8f * newColor2;
+                            pointRandomLamp = lamp.position;
                         }
 
-                        Vector3 pointRandomLampMetal;
+                        Ray rayFromX = new Ray(new Position(pEp), new Direction(pointRandomLamp - pEp));
 
-                        foreach (Lamp lamp in listLamp)
+                        if (IsThereAnIntersectionBetweenAandB(pEp, pointRandomLamp, mainScene))
                         {
-
-                            if (lamp.radius > 0)
-                            {
-                                Vector3 offset = new Vector3(GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius), GetRandomNumber(-lamp.radius, lamp.radius));
-                                pointRandomLampMetal = lamp.position + offset;
-                            }
-                            else
-                            {
-                                pointRandomLampMetal = lamp.position;
-                            }
-
-                            Ray rayFromX = new Ray(new Position(pEp), new Direction(pointRandomLampMetal - pEp));
-
-                            if (IsThereAnIntersectionBetweenAandB(pEp, pointRandomLampMetal, listSphere))
-                            {
-                                colorHit += new Vector3(0, 0, 0);
-                            }
-                            else
-                            {
-                                colorHit += CalculInstensity(1, N, Vector3.Normalize(pointRandomLampMetal - pEp), pEp, pointRandomLampMetal, lamp.le, hit.sphere.Albedo);
-                            }
+                            colorHit += new Vector3(0, 0, 0);
                         }
-
-                        break;
+                        else
+                        {
+                            colorHit += CalculInstensity(1, N, Vector3.Normalize(pointRandomLamp - pEp), pEp, pointRandomLamp, lamp.le, hit.obj.albedo);
+                        }
+                    }
                 }
                 return true;
 
@@ -361,9 +334,7 @@ namespace TPSyntheseRT
             }
 
             return hasFoundIntersection;
-
-
-        }
+    }
 
         public static Color CreateColorFromVector(Vector3 vectColor)
         {
@@ -397,10 +368,10 @@ namespace TPSyntheseRT
 
         public static bool Intersect_Ray_Sphere(Ray ray, Sphere sphere, out float t)
         {
-            Vector3 oc = ray.StartPosition.Origin - sphere.Center;
+            Vector3 oc = ray.StartPosition.Origin - sphere.center;
             float a = 1;
             float b = 2.0f * Vector3.Dot(oc, ray.Direction.Dir);
-            float c = Vector3.Dot(oc, oc) - sphere.Radius * sphere.Radius;
+            float c = Vector3.Dot(oc, oc) - sphere.radius * sphere.radius;
             float t1;
             bool result = SolveQuadratic(ref a, ref b, ref c, out t, out t1);
             if (t > 0)
