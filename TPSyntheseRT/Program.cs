@@ -415,6 +415,31 @@ namespace TPSyntheseRT
             return true;
         }
 
+        public static bool Intersect_Ray_Triangle_Moller(Ray ray, Vector3 v0, Vector3 v1, Vector3 v2, out float t)
+        {
+            float kEpsilon = 0.01f;
+            float u, v;
+            t = 0;
+            Vector3 v0v1 = v1 - v0;
+            Vector3 v0v2 = v2 - v0;
+            Vector3 pvec = Vector3.Cross(ray.Direction.Dir, v0v2);
+            float det = Vector3.Dot(v0v1,pvec);
+            if (det > -kEpsilon && det < kEpsilon) return false;
+
+            float invDet = 1 / det;
+            Vector3 tvec = ray.StartPosition.Origin - v0;
+            u = Vector3.Dot(tvec, pvec) * invDet;
+            if (u < 0 || u > 1) return false;
+
+            Vector3 qvec = Vector3.Cross(tvec, v0v1);
+            v = Vector3.Dot(ray.Direction.Dir, qvec) * invDet;
+            if (v < 0 || u + v > 1) return false;
+
+            t = Vector3.Dot(v0v2, qvec) * invDet;
+
+            return true;
+        }
+
         /// <summary>
         /// Calcule l'intensit� lumineuse d'une surface non mirroir
         /// </summary>
