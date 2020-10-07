@@ -1,9 +1,11 @@
 using SFML.Graphics;
+using SFML.System;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Xml;
 using System.Xml.Schema;
@@ -21,6 +23,9 @@ namespace TPSyntheseRT
             Image image = new Image(width, height, SFML.Graphics.Color.Cyan);
 
             List<Sphere> sphereList = BuildSphere(width, height);
+
+
+            OFFReader.ReadFile(@"D:\bunny.off", out List<Vector3> listVertex, out List<int> listIndex);
 
             List<Lamp> listLamp = BuildLamp(width, height);
 
