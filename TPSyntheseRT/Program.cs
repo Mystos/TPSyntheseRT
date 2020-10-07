@@ -222,21 +222,57 @@ namespace TPSyntheseRT
             return (Vector3.Dot(-ray.Direction.Dir, N)) * N * 2 + ray.Direction.Dir;
         }
 
-        public static bool IsThereAnIntersectionBetweenAandB(Vector3 a, Vector3 b, List<Sphere> scene)
+        public static bool IsThereAnIntersectionBetweenAandB(Vector3 a, Vector3 b, Scene mainScene)
         {
             float minDistance = float.MaxValue;
             bool foundIntersection = false;
             Ray ray = new Ray(new Position(a), new Direction(b - a));
-            foreach (Sphere sphere in scene)
+            foreach (Object3D obj in mainScene.objectsInScene)
             {
-                if (Intersect_Ray_Sphere(ray, sphere, out float distance))
+                float distance;
+                switch (obj)
                 {
-                    if(distance < minDistance && distance <= (b-a).Length())
-                    {
-                        minDistance = distance;
-                        foundIntersection = true;
+                    case Sphere sphere:
+                        if (Intersect_Ray_Sphere(ray, sphere, out distance))
+                        {
+                            if (distance < minDistance && distance <= (b - a).Length())
+                            {
+                                minDistance = distance;
+                                foundIntersection = true;
 
-                    }
+                            }
+                        }
+                        break;
+                    case Polygone poly:
+                        for (int i = 0; i < poly.listIndexes.Count; i += 3)
+                        {
+                            if (Intersect_Ray_Triangle_Moller(ray,
+                                poly.listVerticies[poly.listIndexes[i]],
+                                poly.listVerticies[poly.listIndexes[i + 1]],
+                                poly.listVerticies[poly.listIndexes[i + 2]],
+                                out distance))
+                            {
+                                if (distance < minDistance && distance <= (b - a).Length())
+                                {
+                                    minDistance = distance;
+                                    foundIntersection = true;
+
+                                }
+                            }
+                        }
+                        break;
+                    case Box box:
+                        if (Intersect_Ray_Box(ray, box, out distance))
+                        {
+                            if (distance < minDistance && distance <= (b - a).Length())
+                            {
+                                minDistance = distance;
+                                foundIntersection = true;
+
+                            }
+                        }
+
+                        break;
                 }
             }
             return foundIntersection;
