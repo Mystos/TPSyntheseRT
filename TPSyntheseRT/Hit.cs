@@ -9,7 +9,7 @@ namespace TPSyntheseRT
     {
         public float distance = 0;
         public Vector3 position = new Vector3(0,0,0);
-        public Sphere sphere;
+        public Object3D obj;
 
         public Hit()
         {
