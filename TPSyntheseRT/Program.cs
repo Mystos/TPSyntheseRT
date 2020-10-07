@@ -354,6 +354,62 @@ namespace TPSyntheseRT
 
         }
 
+        public static bool Intersect_Ray_Triangle(Ray ray, Vector3 v0, Vector3 v1, Vector3 v2, out float t)
+        {
+            float kEpsilon = 0.01f;
+
+            // Compute Plane Normal
+            Vector3 v0v1 = v1 - v0;
+            Vector3 v0v2 = v2 - v0;
+            // No need to normalize
+            Vector3 N = Vector3.Cross(v0v1, v0v2);
+            float area2 = N.Length();
+
+            // Step 1 : Finding P
+
+            // Check if ray and plane are parallel
+            float NdotRayDirection = Vector3.Dot(N, ray.Direction.Dir);
+            if (Math.Abs(NdotRayDirection) < kEpsilon) // allmost 0
+            {
+                t = 0;
+                return false; // they are parallel so they don't intersect !
+            }
+
+            // compute d parameter using equation 2
+            float d = Vector3.Dot(N, v0);
+
+            // Compute t (equation 3)
+            t = (Vector3.Dot(N, ray.StartPosition.Origin) + d) / NdotRayDirection;
+            //Check if the triangle is in behind the ray
+            if (t < 0) return false; // the triangle is behind
+
+            // Compute the intersection point using eqution 1
+            Vector3 P = ray.StartPosition.Origin + t * ray.Direction.Dir;
+
+            // Step 2: inside-outside test
+            Vector3 C; // Vector perpendicular to triangle's plane
+
+            //Edge 0
+            Vector3 edge0 = v1 - v0;
+            Vector3 vp0 = P - v0;
+            C = Vector3.Cross(edge0, vp0);
+            if (Vector3.Dot(N, C) < 0) return false; // P is on the right side
+
+            //Edge 1
+            Vector3 edge1 = v2 - v1;
+            Vector3 vp1 = P - v1;
+            C = Vector3.Cross(edge1, vp1);
+            if (Vector3.Dot(N, C) < 0) return false; // P is on the right side
+
+            //Edge 2
+            Vector3 edge2 = v0 - v2;
+            Vector3 vp2 = P - v2;
+            C = Vector3.Cross(edge2, vp2);
+            if (Vector3.Dot(N, C) < 0) return false; // P is on the right side
+
+            return true;
+        }
+
         /// <summary>
         /// Calcule l'intensit� lumineuse d'une surface non mirroir
         /// </summary>
