@@ -5,21 +5,22 @@ using System.Text;
 
 namespace TPSyntheseRT
 {
-    public class Box
+    public class Box : Object3D
     {
-       public Vector3 start;
-       public Vector3 end;
+       public readonly Vector3 start;
+       public readonly Vector3 end;
 
         public Box(Vector3 _start, Vector3 _end)
         {
             this.start = _start;
             this.end = _end;
+            this.center = (end - start) / 2;
         }
 
         public Box(Sphere sphere)
         {
-            this.start = sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius);
-            this.end =sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius);
+            this.start = sphere.center - new Vector3(sphere.radius, sphere.radius, sphere.radius);
+            this.end =sphere.center + new Vector3(sphere.radius, sphere.radius, sphere.radius);
         }
 
         public static Box UnionBox(IList<Box> listBox)
@@ -47,13 +48,13 @@ namespace TPSyntheseRT
             {
                 return null;
             }
-            Vector3 start = listSphere[0].Center;
-            Vector3 end = listSphere[0].Center;
+            Vector3 start = listSphere[0].center;
+            Vector3 end = listSphere[0].center;
 
             foreach (Sphere sphere in listSphere)
             {
-                start = Vector3.Min(sphere.Center - new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), start);
-                end = Vector3.Max(sphere.Center + new Vector3(sphere.Radius, sphere.Radius, sphere.Radius), end);
+                start = Vector3.Min(sphere.center - new Vector3(sphere.radius, sphere.radius, sphere.radius), start);
+                end = Vector3.Max(sphere.center + new Vector3(sphere.radius, sphere.radius, sphere.radius), end);
             }
 
             Vector3 diag = end - start;
