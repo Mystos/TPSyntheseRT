@@ -284,27 +284,75 @@ namespace TPSyntheseRT
         /// <param name="listSphere"></param>
         /// <param name="rayon"></param>
         /// <returns></returns>
-        public static bool GetFirstIntersectionInScene(List<Sphere> listSphere, Ray rayon, out Hit firstHit)
+        public static bool GetFirstIntersectionInScene(Scene mainScene, Ray rayon, out Hit firstHit)
         {
             firstHit = new Hit();
             bool hasFoundIntersection = false;
-            foreach (Sphere sphere in listSphere)
+
+            foreach (Object3D obj in mainScene.objectsInScene)
             {
                 float t;
-                if (Intersect_Ray_Sphere(rayon, sphere, out t))
+
+                switch (obj)
                 {
-                    if (!hasFoundIntersection)
-                    {
-                        firstHit.sphere = sphere;
-                        firstHit.distance = t;
-                    }
-                    else if (t < firstHit.distance)
-                    {
-                        firstHit.sphere = sphere;
-                        firstHit.distance = t;
-                    }
-                    hasFoundIntersection = true;
+                    case Sphere sphere:
+                        if (Intersect_Ray_Sphere(rayon, sphere, out t))
+                        {
+                            if (!hasFoundIntersection)
+                            {
+                                firstHit.obj = sphere;
+                                firstHit.distance = t;
+                            }
+                            else if (t < firstHit.distance)
+                            {
+                                firstHit.obj = sphere;
+                                firstHit.distance = t;
+                            }
+                            hasFoundIntersection = true;
+                        }
+                        break;
+                    case Polygone poly:
+                        for (int i = 0; i < poly.listIndexes.Count; i += 3)
+                        {
+                            if (Intersect_Ray_Triangle_Moller(rayon,
+                                 poly.listVerticies[poly.listIndexes[i]],
+                                 poly.listVerticies[poly.listIndexes[i + 1]],
+                                 poly.listVerticies[poly.listIndexes[i + 2]],
+                                out t))
+                            {
+                                if (!hasFoundIntersection)
+                                {
+                                    firstHit.obj = poly;
+                                    firstHit.distance = t;
+                                }
+                                else if (t < firstHit.distance)
+                                {
+                                    firstHit.obj = poly;
+                                    firstHit.distance = t;
+                                }
+                                hasFoundIntersection = true;
+                            }
+                        }
+                        break;
+
+                    case Box box:
+                        if (Intersect_Ray_Box(rayon, box, out t))
+                        {
+                            if (!hasFoundIntersection)
+                            {
+                                firstHit.obj = box;
+                                firstHit.distance = t;
+                            }
+                            else if (t < firstHit.distance)
+                            {
+                                firstHit.obj = box;
+                                firstHit.distance = t;
+                            }
+                            hasFoundIntersection = true;
+                        }
+                        break;
                 }
+
             }
             if (hasFoundIntersection)
             {
