@@ -11,6 +11,7 @@ using System.Numerics;
 using System.Xml;
 using System.Xml.Schema;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.Assertions;
 
 namespace TPSyntheseRT
 {
@@ -29,7 +30,7 @@ namespace TPSyntheseRT
             {
                 mainScene.objectsInScene.Add(sphere);
             }
-            Sphere sphereCentre = new Sphere(new Vector3(width / 2, height / 2, 800), 200);
+            Sphere sphereCentre = new Sphere(new Vector3(width / 2, height / 2, 500), 200);
             GetMeshFromSphere(sphereCentre, 10, 10, out List<Vector3> listVerticies, out List<int> listIndexes);
             Polygone poly = new Polygone(listVerticies, listIndexes);
             mainScene.objectsInScene.Add(poly);
@@ -139,12 +140,25 @@ namespace TPSyntheseRT
 
             if (GetFirstIntersectionInScene(mainScene, rayon, out Hit hit))
             {
-               
                 // On renvoie un rayon depuis xPos vers L
                 Vector3 pEp = hit.position - epsilon * rayon.Direction.Dir;
-                Vector3 N = Vector3.Normalize(pEp - hit.obj.center);
+                Vector3 N = Vector3.Zero;
+                switch (hit.obj)
+                {
+                    case Sphere sphere:
+                        N = Vector3.Normalize(pEp - hit.obj.center);
+                        break;
+                    case Polygone poly:
+                        Vector3 u = hit.vec[1] - hit.vec[0];
+                        Vector3 v = hit.vec[2] - hit.vec[0];
+                        N = Vector3.Normalize(Vector3.Cross(u, v));
+                        break;
+                    case Box box:
+                        N = Vector3.Normalize(pEp - hit.obj.center);
+                        break;
+                }
 
-                if(hit.obj.type == SurfaceType.Reflective || hit.obj.type == SurfaceType.Metalic)
+                if (hit.obj.type == SurfaceType.Reflective || hit.obj.type == SurfaceType.Metalic)
                 {
                     Ray reflecRay = new Ray(new Position(pEp), new Direction(CalculReflection(rayon, N)));
                     if (CastRay(reflecRay, mainScene, option, out Vector3 newColor, depth + 1))
@@ -152,7 +166,7 @@ namespace TPSyntheseRT
                         colorHit += 0.8f * newColor;
                     }
                 }
-                if(hit.obj.type == SurfaceType.Diffuse || hit.obj.type == SurfaceType.Metalic)
+                if (hit.obj.type == SurfaceType.Diffuse || hit.obj.type == SurfaceType.Metalic)
                 {
                     Vector3 pointRandomLamp;
 
@@ -297,11 +311,21 @@ namespace TPSyntheseRT
                                 {
                                     firstHit.obj = poly;
                                     firstHit.distance = t;
+                                    firstHit.vec = new Vector3[] {
+                                        poly.listVerticies[poly.listIndexes[i]],
+                                        poly.listVerticies[poly.listIndexes[i+1]],
+                                        poly.listVerticies[poly.listIndexes[i+2]]
+                                        };
                                 }
                                 else if (t < firstHit.distance)
                                 {
                                     firstHit.obj = poly;
                                     firstHit.distance = t;
+                                    firstHit.vec = new Vector3[] {
+                                        poly.listVerticies[poly.listIndexes[i]],
+                                        poly.listVerticies[poly.listIndexes[i+1]],
+                                        poly.listVerticies[poly.listIndexes[i+2]]
+                                        };
                                 }
                                 hasFoundIntersection = true;
                             }
@@ -472,7 +496,7 @@ namespace TPSyntheseRT
 
         public static bool Intersect_Ray_Triangle_Moller(Ray ray, Vector3 v0, Vector3 v1, Vector3 v2, out float t)
         {
-            float kEpsilon = 0.01f;
+            float kEpsilon = 0.1f;
             float u, v;
             t = 0;
             Vector3 v0v1 = v1 - v0;
@@ -492,7 +516,12 @@ namespace TPSyntheseRT
 
             t = Vector3.Dot(v0v2, qvec) * invDet;
 
-            return true;
+            if(t < 0)
+            {
+                return false;
+            }
+            //Console.WriteLine(t);
+            return t > 0;
         }
 
         /// <summary>

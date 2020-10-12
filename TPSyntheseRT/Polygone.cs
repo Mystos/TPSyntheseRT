@@ -21,6 +21,7 @@ namespace TPSyntheseRT
 
         public static Vector3 GetGravityCenter(List<Vector3> listVertex)
         {
+            // Attention a voir si ça créer pas des effets de bord
             Vector3 cg = Vector3.Zero;
             foreach (Vector3 vec in listVertex)
             {
