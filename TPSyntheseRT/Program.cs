@@ -28,16 +28,21 @@ namespace TPSyntheseRT
             Scene mainScene = new Scene();
             foreach(Sphere sphere in BuildSphere(width, height))
             {
-                mainScene.objectsInScene.Add(sphere);
+                mainScene.objectsInScene.Add(new Box(sphere));
             }
-            Sphere sphereCentre = new Sphere(new Vector3(width / 2, height / 2, 500), 200);
-            GetMeshFromSphere(sphereCentre, 10, 10, out List<Vector3> listVerticies, out List<int> listIndexes);
+
+            //Polygone poly = new Polygone();
+            OFFReader.ReadFile(@"D:\bunny.off", out List<Vector3> listVerticies, out List<int> listIndexes, 2500);
+            //Sphere sphereCentre = new Sphere(new Vector3(width / 2, height / 2, 800), 200);
+            //GetMeshFromSphere(sphereCentre, 10, 10, out List<Vector3> listVerticies, out List<int> listIndexes);
             Polygone poly = new Polygone(listVerticies, listIndexes);
+            poly = MovePoly(poly, new Vector3(500, 650, 650));
+            poly = RotatePoly(poly, new Vector3(90, 90, 0));
             mainScene.objectsInScene.Add(poly);
 
 
-            //Polygone poly = new Polygone();
-            //OFFReader.ReadFile(@"D:\bunny.off", out poly.listVerticies, out poly.listIndexes, 100);
+
+
 
             mainScene.lamps.AddRange(BuildLamp(width, height));
 
@@ -56,7 +61,7 @@ namespace TPSyntheseRT
                         dir = new Direction(new Vector3(x, y, 0) - new Vector3(pointPerspective.X, pointPerspective.Y, pointPerspective.Z));
                     }
 
-                    int raycount = 1;
+                    int raycount = 1000;
 
                     Vector3 couleur = Vector3.Zero;
 
@@ -87,6 +92,82 @@ namespace TPSyntheseRT
 
         ///////////////////////////////////////// RANDOM OPERATIONS /////////////////////////////////////////
         private static System.Random random = new System.Random(4587);
+
+        public static Polygone MovePoly(Polygone polygone, Vector3 amount)
+        {
+            for (int i = 0; i < polygone.listVerticies.Count; i++)
+            {
+                polygone.listVerticies[i] += amount;
+            }
+
+            polygone.center = Polygone.GetGravityCenter(polygone.listVerticies);
+
+            return polygone;
+        }
+
+        public static Polygone RotatePoly(Polygone polygone, Vector3 amount)
+        {
+            List<Vector3> newVertex = new List<Vector3>();
+
+            Quaternion newRotation = GetQuaternion(amount.X, amount.Y, amount.Z);
+            Vector3 vecRotation = GetEulerAngle(newRotation.W, newRotation.X, newRotation.Y, newRotation.Z);
+
+            for (int i = 0; i < polygone.listVerticies.Count; i++)
+            {
+                polygone.listVerticies[i] = vecRotation * (polygone.listVerticies[i] - polygone.center) + polygone.center;
+            }
+            polygone.center = Polygone.GetGravityCenter(polygone.listVerticies);
+
+            return polygone;
+        }
+
+        public static Vector3 GetEulerAngle(float w, float x, float y, float z)
+        {
+            float epsilon = 0.00001f;
+            float halfpi = 0.5f * (float)Math.PI;
+            Vector3 result;
+
+            float temp = 2*(y*z - x*w);
+            if(temp >= 1 - epsilon)
+            {
+                result.X = halfpi;
+                result.Y = (float)-Math.Atan2(y, w);
+                result.Z = (float)-Math.Atan2(z, w);
+            }else if(-temp >= 1 - epsilon)
+            {
+                result.X = -halfpi;
+                result.Y = -(float)-Math.Atan2(y, w);
+                result.Z = -(float)-Math.Atan2(z, w);
+            }
+            else
+            {
+                result.X = (float)Math.Asin(temp);
+                result.Y = (float)-Math.Atan2(x*z + y*w, 0.5f - x*x - y*y);
+                result.Z = (float)-Math.Atan2(x*y + z*w, 0.5f - x*x - z*z);
+            }
+
+            return result;
+
+        }
+
+        public static Quaternion GetQuaternion(float x, float y, float z)
+        {
+            float cx, sx, cy, sy, cz, sz, i, w, j, k;
+            cx = (float)Math.Cos(-0.5f * x);
+            sx = (float)Math.Sin(-0.5f * x);
+            cy = (float)Math.Cos(-0.5f * y);
+            sy = (float)Math.Sin(-0.5f * y);
+            cz = (float)Math.Cos(-0.5f * z);
+            sz = (float)Math.Sin(-0.5f * z);
+
+            w = cx * cy * cz + sx * sy * sz;
+            i = cx * sy * sz + sx * cy * cz;
+            j = cx * sy * cz - sx * cy * sz;
+            k = cx * cy * sz - sx * sy * cz;
+
+            return new Quaternion(i, j, k, w);
+        }
+
         public static float GetRandomNumber(float minimum, float maximum)
         {
             return (float)random.NextDouble() * (maximum - minimum) + minimum;
@@ -121,7 +202,7 @@ namespace TPSyntheseRT
             List<Lamp> listLamp = new List<Lamp>();
 
             listLamp.Add(new Lamp(new Vector3(0, 0, 800), new Vector3(1000000, 0, 0)));
-            listLamp.Add(new Lamp(new Vector3(width / 2, 0, 500), new Vector3(1000000, 1000000, 1000000)));
+            listLamp.Add(new Lamp(new Vector3(width / 2 - 200, 1000, 200), new Vector3(100000, 100000, 100000)));
             listLamp.Add(new Lamp(new Vector3(width - 100, 0, 200), new Vector3(0, 0, 1000000)));
 
             return listLamp;
@@ -516,12 +597,7 @@ namespace TPSyntheseRT
 
             t = Vector3.Dot(v0v2, qvec) * invDet;
 
-            if(t < 0)
-            {
-                return false;
-            }
-            //Console.WriteLine(t);
-            return t > 0;
+            return true;
         }
 
         /// <summary>

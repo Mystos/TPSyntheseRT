@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj": {}
+    "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj": {}
   },
   "projects": {
-    "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj": {
+    "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
+        "projectUniqueName": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
         "projectName": "TPSyntheseRTTests1",
-        "projectPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
-        "packagesPath": "C:\\Users\\tguyamier\\.nuget\\packages\\",
-        "outputPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\obj\\",
+        "projectPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
+        "packagesPath": "C:\\Users\\Az-Desktop\\.nuget\\packages\\",
+        "outputPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tguyamier\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Az-Desktop\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -27,8 +27,8 @@
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj": {
-                "projectPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj"
+              "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj": {
+                "projectPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj"
               }
             }
           }
@@ -54,6 +54,10 @@
               "target": "Package",
               "version": "[16.5.0, )"
             },
+            "SFML.Net": {
+              "target": "Package",
+              "version": "[2.5.0, )"
+            },
             "coverlet.collector": {
               "target": "Package",
               "version": "[1.2.0, )"
@@ -78,17 +82,17 @@
         }
       }
     },
-    "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj": {
+    "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj",
+        "projectUniqueName": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj",
         "projectName": "TPSyntheseRT",
-        "projectPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj",
-        "packagesPath": "C:\\Users\\tguyamier\\.nuget\\packages\\",
-        "outputPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\obj\\",
+        "projectPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj",
+        "packagesPath": "C:\\Users\\Az-Desktop\\.nuget\\packages\\",
+        "outputPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\tguyamier\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Az-Desktop\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [

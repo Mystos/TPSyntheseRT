@@ -6162,24 +6162,25 @@
       "MSTest.TestAdapter >= 2.1.0",
       "MSTest.TestFramework >= 2.1.0",
       "Microsoft.NET.Test.Sdk >= 16.5.0",
+      "SFML.Net >= 2.5.0",
       "TPSyntheseRT >= 1.0.0",
       "coverlet.collector >= 1.2.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\tguyamier\\.nuget\\packages\\": {}
+    "C:\\Users\\Az-Desktop\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
+      "projectUniqueName": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
       "projectName": "TPSyntheseRTTests1",
-      "projectPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
-      "packagesPath": "C:\\Users\\tguyamier\\.nuget\\packages\\",
-      "outputPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\obj\\",
+      "projectPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\TPSyntheseRTTests1.csproj",
+      "packagesPath": "C:\\Users\\Az-Desktop\\.nuget\\packages\\",
+      "outputPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRTTests1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\tguyamier\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Az-Desktop\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6192,8 +6193,8 @@
       "frameworks": {
         "netcoreapp3.1": {
           "projectReferences": {
-            "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj": {
-              "projectPath": "D:\\VisualStudio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj"
+            "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj": {
+              "projectPath": "D:\\Visual Studio Project\\TPSyntheseRT\\TPSyntheseRT\\TPSyntheseRT.csproj"
             }
           }
         }
@@ -6218,6 +6219,10 @@
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
             "version": "[16.5.0, )"
+          },
+          "SFML.Net": {
+            "target": "Package",
+            "version": "[2.5.0, )"
           },
           "coverlet.collector": {
             "target": "Package",

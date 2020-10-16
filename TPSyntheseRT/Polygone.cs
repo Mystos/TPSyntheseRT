@@ -6,7 +6,7 @@ using System.Text;
 
 namespace TPSyntheseRT
 {
-    class Polygone : Object3D
+    public class Polygone : Object3D
     {
         public readonly List<Vector3> listVerticies = new List<Vector3>(); 
         public readonly List<int> listIndexes = new List<int>();
